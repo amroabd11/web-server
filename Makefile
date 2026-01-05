@@ -15,7 +15,7 @@ OBJ_DIR = obj
 OBJ_DIRS = $(OBJ_DIR)
 
 # INC
-INC = std_includes.hpp  typedefs.hpp  webserv.hpp
+INC = std_includes.hpp typedefs.hpp webserv.hpp
 
 # SRC
 SRC = test.cpp

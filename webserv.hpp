@@ -2,8 +2,8 @@
 #ifndef WEBSERV_HPP
 #define WEBSERV_HPP
 
-#include "std_includes.hpp"
-#include "typedefs.hpp"
+#include "inc/std_includes.hpp"
+#include "inc/typedefs.hpp"
 
 
 
