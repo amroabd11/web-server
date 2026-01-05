@@ -2,15 +2,9 @@
 #ifndef STD_INCLUDES_HPP
 #define STD_INCLUDES_HPP
 
+// ========= STD LIBRARIES =======
 #include <string>
-
-
-
-
-
-// ========= DEBUGGING =======
+#include <cstdlib>
 #include <iostream>
-
-
 
 #endif

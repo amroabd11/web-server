@@ -1,5 +1,5 @@
 # Executable
-NAME = btc
+NAME = webserv
 
 # Compilation
 CC = c++
@@ -11,14 +11,16 @@ COMPILE = $(CC) $(COMPL_FLAGS)
 LINK = $(CC) $(LINK_FLAGS)
 
 # obj dirs
+INC_DIR = inc
 OBJ_DIR = obj
 OBJ_DIRS = $(OBJ_DIR)
 
 # INC
-INC = std_includes.hpp typedefs.hpp webserv.hpp
+INC_FILES = std_includes.hpp typedefs.hpp webserv.hpp
+INC = $(addprefix $(INC_DIR)/, $(INC_FILES))
 
 # SRC
-SRC = test.cpp
+SRC = main.cpp
 
 # OBJ
 OBJ = $(addprefix $(OBJ_DIR)/, $(SRC:.cpp=.o))
