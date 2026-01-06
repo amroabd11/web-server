@@ -1,22 +1,15 @@
 #ifndef SERVER_HPP
 #define SERVER_HPP
 
-#include <sys/socket.h>
-#include <iostream>
-#include <vector>
-#include <exception>
-#include <stdint.h>
-#include <stdlib.h>
-#include <sys/epoll.h>
-#include <inet/arpa.h>
 #include "Configs.hpp"
-
+#include "stdIncludes.hpp"
+#include "typedefs.hpp"
 
 struct Listen_sock
 {
 	int fd;
 	uint16_t port;
-	std::vector<Virtual_serv*> vhost;
+	std::vector<virtualServers*> vhost;
 };
 
 class Server

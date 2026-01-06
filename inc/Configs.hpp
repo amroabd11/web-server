@@ -1,18 +1,14 @@
 #ifndef CONFIGS_HPP
 #define CONFIGS_HPP
 
+#include "stdIncludes.hpp"
+#include "typedefs.hpp"
 
-#include <iostream>
-#include <vector>
-#include <cstdint>
-#include <exception>
-//#include "Server.hpp"
-
-struct	Virtual_servers
+struct	virtualServers
 {
 	uint16_t	port;
-	std::string	host;
-	std::string	root;
+	str			host;
+	str			root;
 	//other directives;
 };
 
@@ -20,7 +16,7 @@ class Config
 {
 	public:
 		Config(char *file);
-		std::vector<Virtual_servers> vservers;
+		std::vector<virtualServers> vservers;
 };
 
 
