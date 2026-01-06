@@ -11,7 +11,8 @@
  *
  * */
 
-#include "inc/webserv.hpp"
+#include "inc/Configs.hpp"
+#include "inc/Server.hpp"
 
 int main(int ac, char **av)
 {
@@ -20,7 +21,11 @@ int main(int ac, char **av)
         std::cerr << "Usage:\n\t./webserv <config_file>\n" << std::endl;
         return EXIT_FAILURE;
     }
-    str configFile = str(av[1]);
+
+	Config configFile(av[1]);
+	Server server(configFile);
+
+
 
     std::cout << "project only works on my machine" << std::endl;
 
