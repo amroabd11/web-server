@@ -4,6 +4,16 @@
 #include "stdIncludes.hpp"
 #include "typedefs.hpp"
 
+
+// yes yes kml its a good idea
+struct	virtualServers
+{
+	uint16_t	port;
+	str			host;
+	str			root;
+	//other directives;
+};
+
 class Config
 {
 	public:

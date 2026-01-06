@@ -6,4 +6,16 @@
 #include "typedefs.hpp"
 #include "VirtualServer.hpp"
 
+
+class Server {
+
+public:
+
+	Server(const Config config);
+	~Server();
+	
+
+
+}
+
 #endif

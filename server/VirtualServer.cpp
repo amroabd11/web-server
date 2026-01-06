@@ -19,10 +19,16 @@ VirtualServer::VirtualServer(str host, int port)
 	struct sockaddr_in	addr;
 
 	addr.sin_family = AF_INET;
-    addr.sin_port = htons(port);
+	addr.sin_port = htons(port);
 	inet_aton(host.c_str(), &addr.sin_addr);
 
 	res = bind(sockfd, (struct sockaddr *)&addr, sizeof(addr))
+	if (res < 0)
+		somethingWentWrong("bind");
+
+	res = listen(sockfd, 10);
+	if (res < 0)
+		somethingWentWrong("listen");
 
 }
 
