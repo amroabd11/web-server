@@ -4,19 +4,17 @@
 #include "stdIncludes.hpp"
 #include "typedefs.hpp"
 
-struct	virtualServers
-{
-	uint16_t	port;
-	str			host;
-	str			root;
-	//other directives;
-};
-
 class Config
 {
 	public:
+		// DATA
+		std::vector<virtualServers> vServers;
+
+		// contructor
 		Config(char *file);
-		std::vector<virtualServers> vservers;
+
+		// functions
+
 };
 
 
