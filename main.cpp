@@ -26,8 +26,8 @@ int main(int ac, char **av)
     try {
         Config configFile(av[1]);
         Server server(configFile);
-    } catch (...) {
-        std::cerr << "Error. \n";
+    } catch (std::exception& e) {
+        std::cerr << "Error : " << e.what() << std::endl;
     }
     
 

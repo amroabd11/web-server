@@ -2,7 +2,7 @@
 
 #include "./../inc/Server.hpp"
 
-VirtualServer::VirtualServer(str host, int port, int epfd, Config& config)
+VirtualServer::VirtualServer(str host, int port, int epfd, const Config& config)
 {
 	int	res;
 
@@ -16,7 +16,7 @@ VirtualServer::VirtualServer(str host, int port, int epfd, Config& config)
 	addr.sin_port = htons(port);
 	inet_aton(host.c_str(), &addr.sin_addr);
 
-	res = bind(sockfd, (struct sockaddr *)&addr, sizeof(addr))
+	res = bind(sockfd, (struct sockaddr *)&addr, sizeof(addr));
 	if (res < 0)
 		somethingWentWrongFunc("bind");
 
@@ -27,16 +27,19 @@ VirtualServer::VirtualServer(str host, int port, int epfd, Config& config)
 	struct epoll_event event;
 
 	event.events = EPOLLIN;
-	event.fd = sockfd;	
+	event.data.fd = sockfd;	
 
 	this->epfd = epfd;
-	this->config = config;
+	this->config = &config;
 
 	res = epoll_ctl(epfd, EPOLL_CTL_ADD, sockfd, &event);
 	if (res < 0)
-		somethingWentWrongFuncFunc("epoll_ctl");
+		somethingWentWrongFunc("epoll_ctl");
 
 
 }
 
+VirtualServer::~VirtualServer()
+{
 
+}

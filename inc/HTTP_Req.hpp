@@ -21,6 +21,6 @@ public:
 
 	// === CONSTRUCTOR ===
 	HTTP_Req();
-}
+};
 
 #endif

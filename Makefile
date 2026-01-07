@@ -27,7 +27,7 @@ INC_FILES = Configs.hpp Server.hpp stdIncludes.hpp typedefs.hpp
 INC = $(addprefix $(INC_DIR)/, $(INC_FILES))
 
 # Source Files
-SERV_FILES = Config.cpp Server.cpp test.cpp
+SERV_FILES = Config.cpp HTTP_Req.cpp Server.cpp VirtualServer.cpp
 PARS_FILES = test.cpp
 CGI_FILES = test.cpp
 
@@ -45,22 +45,22 @@ all: $(NAME)
 
 $(NAME): $(OBJ)
 	@$(LINK) $(OBJ) -o $@
-	@echo "[CREATING the legendary executable $@...]"
+	@echo "[✅ BUILT $@]"
 
 $(OBJ_DIRS):
 	@mkdir -p $(OBJ_DIRS)
-	@echo "[CREATING object directories...]"
+	@echo "[📁 CREATING object directories]"
 
 $(OBJ_DIR)/%.o: %.cpp $(INC) | $(OBJ_DIRS)
 	@$(COMPILE) -c $< -o $@
-	@echo "[COMPILING $<...]"
+	@echo "[🔧 COMPILING $<]"
 
 clean:
-	@rm -rf $(OBJ_DIR)
-	@echo "[CLEANING object files...]"
+	@rm -fr $(OBJ_DIR)
+	@echo "[🧼 CLEANING the obj files]"
 
 fclean: clean
 	@rm -f $(NAME)
-	@echo "[CLEANING the executable...]"
+	@echo "[🧼 CLEANING the executable]"
 
 re: fclean all

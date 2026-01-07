@@ -3,14 +3,14 @@
 
 void	somethingWentWrongFunc(const char *syscall)
 {
-	perror(syscall);
+	std::cerr << syscall << ": ";
 	throw Server::somethingWentWrong();
 }
 
 // === EXCEPTIONS ===
 const char*	Server::somethingWentWrong::what() const throw()
 {
-	return "(runtime error)";
+	return strerror(errno);
 }
 
 Server::Server(const Config& config)
@@ -29,4 +29,8 @@ Server::Server(const Config& config)
 	}
 
 
+}
+
+Server::~Server()
+{
 }
