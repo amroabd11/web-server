@@ -18,7 +18,7 @@ class Config
 {
 	public:
 		// DATA
-		std::vector<virtualServers> vServers;
+		std::vector<virtualServers>	vServers;
 
 		// contructor
 		Config(char *file);

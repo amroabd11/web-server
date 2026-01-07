@@ -2,19 +2,13 @@
 
 #include "./../inc/Server.hpp"
 
-void	somethingWentWrong(const char *syscall)
-{
-	perror(syscall);
-	throw std::runtime_error();
-}
-
-VirtualServer::VirtualServer(str host, int port)
+VirtualServer::VirtualServer(str host, int port, int epfd, Config& config)
 {
 	int	res;
 
 	sockfd = socket(AF_INET, SOCK_STREAM, 0);
 	if (sockfd < 0)
-		somethingWentWrong("socket");
+		somethingWentWrongFunc("socket");
 
 	struct sockaddr_in	addr;
 
@@ -24,11 +18,24 @@ VirtualServer::VirtualServer(str host, int port)
 
 	res = bind(sockfd, (struct sockaddr *)&addr, sizeof(addr))
 	if (res < 0)
-		somethingWentWrong("bind");
+		somethingWentWrongFunc("bind");
 
 	res = listen(sockfd, 10);
 	if (res < 0)
-		somethingWentWrong("listen");
+		somethingWentWrongFunc("listen");
+
+	struct epoll_event event;
+
+	event.events = EPOLLIN;
+	event.fd = sockfd;	
+
+	this->epfd = epfd;
+	this->config = config;
+
+	res = epoll_ctl(epfd, EPOLL_CTL_ADD, sockfd, &event);
+	if (res < 0)
+		somethingWentWrongFuncFunc("epoll_ctl");
+
 
 }
 

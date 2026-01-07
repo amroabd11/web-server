@@ -14,5 +14,7 @@
 #include <sys/epoll.h>
 #include <arpa/inet.h>
 #include <unistd.h>
+#include <stdexcept>
+#include <errno.h>
 
 #endif

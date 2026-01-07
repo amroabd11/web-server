@@ -11,11 +11,11 @@ public:
 	// === DATA ===
 	int						sockfd; // server socket fd
 	int						epfd; // global epoll fd
-	Config					*config;
+	Config&					config;
 	std::map<int, HTTP_Req>	reqOfClient; // get HTTP_Req of certain fd
 
 	// === CONSTRUCTOR ===
-	VirtualServer(str host, int port);
+	VirtualServer(str host, int port, int epfd, Config& config);
 	~VirtualServer();
 
 	// === Functions ===

@@ -22,12 +22,14 @@ int main(int ac, char **av)
         return EXIT_FAILURE;
     }
 
-	Config configFile(av[1]);
-	Server server(configFile);
 
-
-
-    std::cout << "project only works on my machine" << std::endl;
+    try {
+        Config configFile(av[1]);
+        Server server(configFile);
+    } catch (...) {
+        std::cerr << "Error. \n";
+    }
+    
 
     return EXIT_SUCCESS;
 }
