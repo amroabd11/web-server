@@ -11,6 +11,7 @@
 class HTTP_Req {
 public:
 	// === DATA ===
+	bool	isComplete;
 	char	buffer[1024];
 	size_t	buff_len;
 	
