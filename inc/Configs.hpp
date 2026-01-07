@@ -6,7 +6,7 @@
 
 
 // yes yes kml its a good idea
-struct	virtualServers
+struct	virtualServersParsing
 {
 	uint16_t	port;
 	str			host;
@@ -18,7 +18,7 @@ class Config
 {
 	public:
 		// DATA
-		std::vector<virtualServers>	vServers;
+		std::vector<virtualServersParsing>	vServers;
 
 		// contructor
 		Config(char *file);
