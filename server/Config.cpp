@@ -3,6 +3,7 @@
 
 Config::Config(char *file)
 {
+
 	(void)file;
 	virtualServersParsing	vs1;// this are just for testing real ones will come from config file
 	vs1.port = 8090;
