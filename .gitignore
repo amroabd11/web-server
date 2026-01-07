@@ -1,3 +1,5 @@
 
 webserv
 obj
+*.swp
+*.swo

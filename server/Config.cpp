@@ -4,10 +4,14 @@
 Config::Config(char *file)
 {
 	(void)file;
-	vServers[0].port = 8090;
-	vServers[0].host = "10.12.7.3";
-	vServers[0].root = "/";
-	vServers[1].port = 9097;
-	vServers[1].host = "localhost";
-	vServers[1].root = "/home";
+	virtualServersParsing	vs1;// this are just for testing real ones will come from config file
+	vs1.port = 8090;
+	vs1.host = "127.0.0.1";
+	vs1.root = "/";
+	// virtualServersParsing	vs2;
+	// vs2.port = 8080;
+	// vs2.host = "localhost";
+	// vs2.root = "/home";
+	vServers.push_back(vs1);
+	// vServers.push_back(vs2);
 }

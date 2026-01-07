@@ -9,7 +9,9 @@ VirtualServer::VirtualServer(str host, int port, int epfd, const Config& config)
 	fd = socket(AF_INET, SOCK_STREAM, 0);
 	if (fd < 0)
 		somethingWentWrongFunc("socket");
-
+		
+	// setsockopt
+	
 	struct sockaddr_in	addr;
 
 	addr.sin_family = AF_INET;

@@ -52,8 +52,11 @@ void	Server::run( void )
 	struct epoll_event		newEvent, modifiedEvent;
 	int						clientFd, readyFd, res, vServerIdx;
 	char					clientReqBuffer[HTTPRequestBufferSize];
+	ssize_t					clientReqSize;
 	str						response;
 	std::vector<HTTP_Req>	requests;
+
+	std::cout << "before loop" << std::endl;
 
 	while (1)
 	{
@@ -84,9 +87,13 @@ void	Server::run( void )
 				{
 					// new HTTP Req
 					// it would be good to mesure the time read() spends on reading
-					read(readyFd, clientReqBuffer, HTTPRequestBufferSize);
+					clientReqSize = read(readyFd, clientReqBuffer, HTTPRequestBufferSize);
+					if (clientReqSize < 0)
+						somethingWentWrongFunc("read");
+					clientReqBuffer[clientReqSize] = '\0';
 					// and now comes parsing the req
 					// parse(buffer)
+					std::cout << clientReqBuffer << std::endl;
 
 					// if parse returns 0  ----> a request is parsed and we need to respond
 					// request.isComplete = ;
