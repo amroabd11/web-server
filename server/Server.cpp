@@ -25,6 +25,7 @@ Server::Server(const Config& config)
 		str host = config.vServers[i].host;
 		
 		VirtualServer	vServ(host, port, epfd, config);
+		vServ.vServConfig = &config.vServers[i];
 		vServers.push_back(vServ);
 	}
 }
@@ -54,13 +55,15 @@ void	Server::run( void )
 	char					clientReqBuffer[HTTPRequestBufferSize];
 	ssize_t					clientReqSize;
 	str						response;
-	std::vector<HTTP_Req>	requests;
+	HTTP_Req				request;
 
 	std::cout << "before loop" << std::endl;
 
 	while (1)
 	{
 		int nfds = epoll_wait(this->epfd, events, MAX_EVENTS, -1);
+		
+		std::cout << "==========" << nfds << "==========" << std::endl;
 
 		for (int i = 0; i < nfds; i++)
 		{
@@ -76,7 +79,7 @@ void	Server::run( void )
 					somethingWentWrongFunc("accept");
 				newEvent.data.fd = clientFd;
 				newEvent.events = EPOLLIN;
-				getServerOfThisClient[clientFd] = vServers[vServerIdx];
+				getServerOfThisClient[clientFd] = &vServers[vServerIdx];
 				res = epoll_ctl(epfd, EPOLL_CTL_ADD, clientFd, &newEvent);
 				if (res < 0)
 					somethingWentWrongFunc("epoll_ctl");
@@ -90,32 +93,47 @@ void	Server::run( void )
 					clientReqSize = read(readyFd, clientReqBuffer, HTTPRequestBufferSize);
 					if (clientReqSize < 0)
 						somethingWentWrongFunc("read");
+					else if (clientReqSize == 0)
+					{
+						// close connection
+						close(readyFd);
+						continue ;
+					}
+					
 					clientReqBuffer[clientReqSize] = '\0';
 					// and now comes parsing the req
 					// parse(buffer)
-					std::cout << clientReqBuffer << std::endl;
+					std::cout << "'" << clientReqBuffer << "'" << std::endl;
+
 
 					// if parse returns 0  ----> a request is parsed and we need to respond
 					// request.isComplete = ;
-					// 3mro parsing func  --->   std::vector<HTTP_Req>	parse(char *rawBytes);
-					for (unsigned long i = 0; i < requests.size(); i++)
-					{
-						HTTP_Req	request = requests[i];
+					// 3mro parsing func  --->   HTTP_Req	parse(char *rawBytes);
 
-						response = getServerOfThisClient[clientFd].serve(request);
-						modifiedEvent.data.fd = readyFd;
-						modifiedEvent.events = EPOLLOUT;
-						res = epoll_ctl(epfd, EPOLL_CTL_MOD, readyFd, &modifiedEvent);
-						if (res < 0)
-							somethingWentWrongFunc("epoll_ctl");
-					}
+					getServerOfThisClient[clientFd]->serve(request, readyFd);
+					modifiedEvent.data.fd = readyFd;
+					modifiedEvent.events = EPOLLOUT;
+					res = epoll_ctl(epfd, EPOLL_CTL_MOD, readyFd, &modifiedEvent);
+					if (res < 0)
+						somethingWentWrongFunc("epoll_ctl");
 					// if parse returns -1 ----> a request is incomplete
-					continue ;
+					// continue ;
 
-				} else if (events[i].events == EPOLLOUT)
+				}
+				else if (events[i].events == EPOLLOUT)
 				{
+					std::cout << "responding" << std::endl;
+					response = getServerOfThisClient[clientFd]->getResponseOfClient[clientFd];
+					std::cout << response << std::endl;
+					std::cout << readyFd << std::endl;
 					write(readyFd, response.c_str(), response.size());
-					events[i].events = EPOLLIN;
+
+					// back to reading
+					modifiedEvent.data.fd = readyFd;
+					modifiedEvent.events = EPOLLIN;
+					res = epoll_ctl(epfd, EPOLL_CTL_MOD, readyFd, &modifiedEvent);
+					if (res < 0)
+						somethingWentWrongFunc("epoll_ctl");
 				}
 			}
 		}

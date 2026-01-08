@@ -10,10 +10,13 @@ class VirtualServer
 {
 public:
 	// === DATA ===
-	int						fd; // server socket fd
-	int						epfd; // global epoll fd
-	const Config*			config;
-	// std::map<int, HTTP_Req>	reqOfClient; // get HTTP_Req of certain fd
+	int							fd; // server socket fd
+	int							epfd; // global epoll fd
+	const Config*				config;
+	std::map<int, str>			getResponseOfClient;
+	const virtualServersParsing	*vServConfig;
+	// map client fd to response
+	// (so we know what of the many responses to give to a certain client)
 
 	// === CONSTRUCTOR ===
 	VirtualServer();
@@ -21,7 +24,7 @@ public:
 	~VirtualServer();
 
 	// === Functions ===
-	str		serve(HTTP_Req& request);
+	void		serve(HTTP_Req& request, int clientFd);
 };
 
 

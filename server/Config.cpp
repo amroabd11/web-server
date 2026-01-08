@@ -8,10 +8,10 @@ Config::Config(char *file)
 	vs1.port = 8090;
 	vs1.host = "127.0.0.1";
 	vs1.root = "/";
-	// virtualServersParsing	vs2;
-	// vs2.port = 8080;
-	// vs2.host = "localhost";
-	// vs2.root = "/home";
+	virtualServersParsing	vs2;
+	vs2.port = 8080;
+	vs2.host = "localhost";
+	vs2.root = "/home";
 	vServers.push_back(vs1);
-	// vServers.push_back(vs2);
+	vServers.push_back(vs2);
 }

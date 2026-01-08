@@ -15,8 +15,9 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <stdexcept>
-#include <errno.h>
+#include <cerrno>
 #include <string.h>
 #include <map>
+#include <sstream>
 
 #endif

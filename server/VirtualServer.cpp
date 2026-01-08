@@ -54,11 +54,18 @@ VirtualServer::~VirtualServer()
 
 
 // === Functions ===
-str		VirtualServer::serve(HTTP_Req& request)
+void		VirtualServer::serve(HTTP_Req& request, int clientFd)
 {
 	// now process the req and serve it
 	// request
 	(void)request;
-	return "HTTP/1.1 200 OK\nCP_Z3R0{itsworkingBABY}";
+
+	std::stringstream ss;
+
+	ss << vServConfig->port;
+
+	str response = "HTTP/1.1 200 OK\nCP_Z3R0{itsworkingBABY}\nhello from " + vServConfig->host + ":" + ss.str();
+	this->getResponseOfClient[clientFd] = response;
+
 }
 
