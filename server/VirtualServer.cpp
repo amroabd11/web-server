@@ -39,6 +39,9 @@ VirtualServer::VirtualServer(str host, int port, int epfd, const Config& config)
 		somethingWentWrongFunc("epoll_ctl");
 
 
+
+	std::cout << "listening on " << host << ":" << port << " port is " << port << "\n";
+	std::cout << "use command: nc " << host << " " << port << "\n";
 }
 
 VirtualServer::VirtualServer()
@@ -54,18 +57,56 @@ VirtualServer::~VirtualServer()
 
 
 // === Functions ===
-void		VirtualServer::serve(HTTP_Req& request, int clientFd)
+void		VirtualServer::serve(HTTP_Req& request)
 {
 	// now process the req and serve it
 	// request
-	(void)request;
 
-	std::stringstream ss;
+	// str response = "HTTP/1.1 200 OK\n";
+	str response;
+	str version = "HTTP/1.1";
+	str	status;
+	str	body;
 
-	ss << vServConfig->port;
+	response = version;
 
-	str response = "HTTP/1.1 200 OK\nCP_Z3R0{itsworkingBABY}\nhello from " + vServConfig->host + ":" + ss.str();
-	this->getResponseOfClient[clientFd] = response;
+	if (request.method == "GET")
+	{
+		std::ifstream	file2Serve((this->vServConfig->root + request.route).c_str());
+		//  check if open 
+		if (!file2Serve.is_open())
+			status = HTTP_404;
+		else
+		{
+			str content;
+			std::getline(file2Serve, content, '\0');
+			body = content;
+			status = HTTP_200;
+		}
+		response += " " + status +  "\n";
+		response += body;
+	}
+	else if (request.method == "POST")
+	{
+		std::ofstream	file2Post((this->vServConfig->root + request.route).c_str());
 
+		if (!file2Post.is_open())
+			status = HTTP_404;
+		else
+		{
+			file2Post << request.body;
+			status = HTTP_200;
+		}
+		response += " " + status +  "\n";
+	}
+	else if (request.method == "DELETE")
+	{
+
+		response += " " + str(HTTP_200) +  "\n";
+	}
+	else
+		response += " " + str(HTTP_405) +  "\n";
+
+	request.response = response;
 }
 

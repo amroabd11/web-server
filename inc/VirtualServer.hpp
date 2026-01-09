@@ -13,8 +13,8 @@ public:
 	int							fd; // server socket fd
 	int							epfd; // global epoll fd
 	const Config*				config;
-	std::map<int, str>			getResponseOfClient;
 	const virtualServersParsing	*vServConfig;
+	std::vector<HTTP_Req>		currentRequests;
 	// map client fd to response
 	// (so we know what of the many responses to give to a certain client)
 
@@ -24,7 +24,7 @@ public:
 	~VirtualServer();
 
 	// === Functions ===
-	void		serve(HTTP_Req& request, int clientFd);
+	void		serve(HTTP_Req& request);
 };
 
 

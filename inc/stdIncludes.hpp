@@ -19,5 +19,6 @@
 #include <string.h>
 #include <map>
 #include <sstream>
+#include <fstream>
 
 #endif

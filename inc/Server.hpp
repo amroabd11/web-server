@@ -20,8 +20,8 @@ public:
 	// === DATA ===
 	int								epfd;
 	std::vector<VirtualServer>		vServers;
-	std::map<int, VirtualServer*>	getServerOfThisClient;
-	// map client fd to vserver ptr (so client know what to be served by)
+	std::map<int, std::pair<VirtualServer*, int> >	getServerAndReqOfClient;
+	// map client fd to vserver ptr and nth request in the list of current requests
 	
 	// === CONSTRUCTOR ===
 	Server(const Config& config);

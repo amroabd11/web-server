@@ -11,14 +11,19 @@
 class HTTP_Req {
 public:
 	// === DATA ===
-	bool	isComplete;
-	char	buffer[1024];
-	size_t	buff_len;
+	bool				isComplete;
+
+	str					method; // "GET"
+	str					route; // "/"
+	str					version; // "HTTP/1.1"
+
+	std::map<str, str>	headers;
+	str					body;
 	
-	// === HTTP ===
-	// methods
-	// headers
-	// body
+	str					response;
+	
+	// === parsing and filling the object ===
+	void	parse(char *rawBytes);
 
 	// === CONSTRUCTOR ===
 	HTTP_Req();
