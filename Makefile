@@ -23,12 +23,12 @@ OBJ_DIRS = $(OBJ_DIR)/$(SERV) \
 
 # INC
 INC_DIR = inc
-INC_FILES = Configs.hpp Server.hpp stdIncludes.hpp typedefs.hpp
+INC_FILES = Configs.hpp Server.hpp stdIncludes.hpp typedefs.hpp ConfigParser.hpp
 INC = $(addprefix $(INC_DIR)/, $(INC_FILES))
 
 # Source Files
 SERV_FILES = Config.cpp HTTP_Req.cpp Server.cpp VirtualServer.cpp
-PARS_FILES = test.cpp
+PARS_FILES = ParseConfigfile.cpp test.cpp
 CGI_FILES = test.cpp
 
 # SRC

@@ -17,6 +17,8 @@
 #include <stdexcept>
 #include <errno.h>
 #include <string.h>
+#include <string>
 #include <map>
+#include <fstream>
 
 #endif

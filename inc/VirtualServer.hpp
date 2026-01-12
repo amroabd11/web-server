@@ -6,6 +6,8 @@
 #include "typedefs.hpp"
 #include "HTTP_Req.hpp"
 
+class	Config;
+
 class VirtualServer
 {
 public:

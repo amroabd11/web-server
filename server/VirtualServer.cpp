@@ -16,6 +16,10 @@ VirtualServer::VirtualServer(str host, int port, int epfd, const Config& config)
 	addr.sin_port = htons(port);
 	inet_aton(host.c_str(), &addr.sin_addr);
 
+	int opt;
+	setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
+	setsockopt(fd, SOL_SOCKET, SO_REUSEPORT, &opt, sizeof(opt));
+
 	res = bind(fd, (struct sockaddr *)&addr, sizeof(addr));
 	if (res < 0)
 		somethingWentWrongFunc("bind");

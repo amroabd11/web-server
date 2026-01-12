@@ -26,6 +26,7 @@ int main(int ac, char **av)
     try {
         Config configFile(av[1]);
         Server server(configFile);
+	server.run();
     } catch (std::exception& e) {
         std::cerr << "Error : " << e.what() << std::endl;
     }
