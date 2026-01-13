@@ -64,7 +64,7 @@ void	Server::run( void )
 	{
 		int nfds = epoll_wait(this->epfd, events, MAX_EVENTS, -1);
 		
-		std::cout << "==========" << nfds << "==========" << std::endl;
+		// std::cout << "==========" << nfds << "==========" << std::endl;
 
 		for (int i = 0; i < nfds; i++)
 		{
@@ -120,7 +120,7 @@ void	Server::run( void )
 
 					req.parse(clientReqBuffer);
 
-					if (req.isComplete)
+					if (req.isReqComplete)
 					{
 						modifiedEvent.data.fd = readyFd;
 						modifiedEvent.events = EPOLLOUT;
@@ -146,12 +146,22 @@ void	Server::run( void )
 					
 					write(readyFd, response.c_str(), response.size());
 
-					// back to reading
-					modifiedEvent.data.fd = readyFd;
-					modifiedEvent.events = EPOLLIN;
-					res = epoll_ctl(epfd, EPOLL_CTL_MOD, readyFd, &modifiedEvent);
-					if (res < 0)
-						somethingWentWrongFunc("epoll_ctl");
+					std::cout << "========== back to reading ? " <<  req.isResComplete <<" ==========" << std::endl;
+					if (req.isResComplete)
+					{
+						// back to reading
+						std::cout << "========== back to reading ==========" << std::endl;
+						modifiedEvent.data.fd = readyFd;
+						modifiedEvent.events = EPOLLIN;
+						res = epoll_ctl(epfd, EPOLL_CTL_MOD, readyFd, &modifiedEvent);
+						if (res < 0)
+							somethingWentWrongFunc("epoll_ctl");
+
+					}
+				}
+				else
+				{
+					// std::cout << "==========nigga pleasse ==========" << std::endl;
 				}
 			}
 		}

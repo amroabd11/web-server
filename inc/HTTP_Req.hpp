@@ -11,22 +11,38 @@
 class HTTP_Req {
 public:
 	// === DATA ===
-	bool				isComplete;
+	// flags
+	bool		isReqComplete;
+	bool		isResComplete;
+	bool		sentResHead;
 
-	str					method; // "GET"
-	str					route; // "/"
-	str					version; // "HTTP/1.1"
+	str			method; // "GET"
+	str			route; // "/"
+	str			version; // "HTTP/1.1"
 
-	std::map<str, str>	headers;
-	str					body;
+	Headers		headers;
+	Queries		queries;
+	str			body;
+	int			CGI;
 	
-	str					response;
+	str			response;
+
+	// fds
+	int			GET_fd;
+	int			POST_fd;
 	
 	// === parsing and filling the object ===
 	void	parse(char *rawBytes);
 
 	// === CONSTRUCTOR ===
 	HTTP_Req();
+};
+
+class responseChunk {
+public:
+	str		size;
+	str		data;
+	str		status;
 };
 
 #endif

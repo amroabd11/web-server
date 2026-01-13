@@ -5,6 +5,7 @@
 #include "stdIncludes.hpp"
 #include "typedefs.hpp"
 #include "VirtualServer.hpp"
+#include "CGI.hpp"
 
 class VirtualServer;
 void	somethingWentWrongFunc(const char *syscall);

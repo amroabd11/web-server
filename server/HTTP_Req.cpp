@@ -5,7 +5,11 @@
 // === CONSTRUCTOR ===
 HTTP_Req::HTTP_Req()
 {
-	isComplete = false;
+	isReqComplete = false;
+	isResComplete = false;
+	sentResHead = false;
+	GET_fd = -2;
+	POST_fd = -2;
 }
 
 
@@ -28,16 +32,32 @@ void	HTTP_Req::parse(char *rawBytes)
 		
 	// }
 
-	this->method = "POST";
-	this->route = "/index.html";
-	this->version = "HTTP/1.1";
+
+
+	ss >> this->method;
+	ss >> this->route;
+	ss >> this->version;
+
+	// this->method = "GET";
+	// this->route = "/index.html";
+	// this->version = "HTTP/1.1";
+
+
 
 	this->headers["Host"] = "127.0.0.1:8201";
 	this->headers["Accept-Language"] = "en-US,en;q=0.6";
-	// ...
-	this->body = "NEW CONTENT BABY";
 
-	this->isComplete = true;
+	this->queries["test"] = "155";
+	this->queries["anothertest"] = "testing string";
+
+	// this->CGI = HTML;
+	this->CGI = HTML;
+	if (this->route == "/test.py")
+		this->CGI = PYTHON;
+	// PYTHON PHP
+	this->body = "";
+
+	this->isReqComplete = true;
 }
 
 

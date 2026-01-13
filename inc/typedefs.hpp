@@ -5,6 +5,10 @@
 #include "stdIncludes.hpp"
 
 typedef std::string str;
+typedef std::map<str, str> Headers;
+typedef std::map<str, str> Queries;
+typedef std::map<str, str>::iterator HeadersIt;
+typedef std::map<str, str>::iterator QueriesIt;
 
 #ifndef MAX_EVENTS
 #define MAX_EVENTS 1024
@@ -12,8 +16,17 @@ typedef std::string str;
 
 #define FD_NOT_SERVER -1
 #define HTTPRequestBufferSize 1024
+#define HTTPResponseBufferSize 1024
 
 #define FD_IS_SERVER(x) x != FD_NOT_SERVER
+
+// CGIs
+#define HTML (0)
+#define PYTHON (1)
+#define PHP (2)
+
+// more beautiful
+#define CRLF "\r\n"
 
 // 1xx – Informational
 #define HTTP_100 "100 Continue"
@@ -50,8 +63,4 @@ typedef std::string str;
 #define HTTP_503 "503 Service Unavailable"
 #define HTTP_504 "504 Gateway Timeout"
 
-
 #endif
-
-
-

@@ -29,7 +29,7 @@ INC = $(addprefix $(INC_DIR)/, $(INC_FILES))
 # Source Files
 SERV_FILES = Config.cpp HTTP_Req.cpp Server.cpp VirtualServer.cpp
 PARS_FILES = test.cpp
-CGI_FILES = test.cpp
+CGI_FILES = CGI.cpp
 
 # SRC
 SRC = main.cpp \

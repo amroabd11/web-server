@@ -20,5 +20,6 @@
 #include <map>
 #include <sstream>
 #include <fstream>
+#include <fcntl.h>
 
 #endif
