@@ -4,10 +4,8 @@
 Config::Config(char *file)
 {
 
-//	(void)file;
 	std::ifstream	nfile;
 	std::vector<str>	content;
-//	std::string	con;
 	try{
 		nfile.open(file, std::ifstream::in);
 		if (!nfile)
@@ -18,30 +16,95 @@ Config::Config(char *file)
 			if (line.empty())
 				continue;
 			content.push_back(line);
-			//con += line + "\n";
 		}
 		nfile.close();
 		if (check_syntax_error(content))
 			throw std::runtime_error("config file syntax checking error ");
-		virtualServersParsing	vsparse;
-		vsparse.port = 9080;
-		vsparse.host = "localhost";
-		config_vServers.push_back(vsparse);
+	//	std::cout << config_vServers[0].port<<std::endl; 
+	//	std::cout << config_vServers[0].host<<std::endl; 
+		//std::cout << config_vServers[0].block[0]<<std::endl; 
+		//std::cout << config_vServers.size()<<std::endl;
+	//	std::map<str,str>& loc = config_vServers[0].locations[0];
+	//	std::map<str, str>::iterator it = loc.begin();
+	//	std::cout << it->first << "=" << it->second<<std::endl;
+		//std::cout << "++++++++++===============\n" ;
+		//std::cout << config_vServers[0].locations[0]["index"] << std::endl;
+		//std::cout << config_vServers[0].locations.size() << std::endl;
+		//tokenize_file_contents(content);
 	} catch(std::exception& e){
 		std::cout << e.what()<<std::endl;
 		throw	Server::somethingWentWrong();
 	}
-	//virtualServersParsing	vs1;// this are just for testing real ones will come from config file
-	//vs1.port = 8090;
-	//vs1.host = "10.12.7.3";
-	//vs1.root = "/";
+}
 
-//	virtualServersParsing	vs2;
-//	vs2.port = 8090;
-//	vs2.host = "127.0.0.1";
-//	vs2.root = "/home";
-//	//vServers.push_back(vs1);
-//	config_vServers.push_back(vs2);
+void	Config::tokenize_file_contents(std::vector<str>& content)
+{
+	for(size_t i = 0; i<content.size(); i++)
+	{
+		//std::cout << content[i]<<std::endl;
+		if (!content[i].empty() && content[i] != "server{")
+			throw std::runtime_error("allowed contexts are servers: you provided unkown context in config file");
+		if (content[i] != "server{")
+			continue;
+		std::vector<str>	block;
+		std::map<str, str> locations;
+		virtualServersParsing	vsblock;
+		std::vector<std::map<str,str> > blockOFlocations;
+		bool	inside = true;
+		for (++i; i < content.size(); i++)
+		{
+			std::string& line = content[i];
+			if (!inside)
+				break;
+			if (line.find('}') != std::string::npos)
+			{
+				inside = false;
+				break ;
+			}
+			if (line == "location{")
+			{
+				bool inside2 = true;
+				for(;i < content.size();i++)
+				{
+					line = content[i];
+					if (line == "location{")
+						continue;
+					//std::cout << line<<std::endl;
+					if (!inside2)
+						break;
+					if (line.find('}') != std::string::npos)
+					{
+						inside2 = false;
+						break;
+					}
+					//std::cout << line<<std::endl;
+					if (line.find('{') != std::string::npos)
+						throw std::runtime_error("config file:unkwon directive inside location");
+					// fill_locations();
+					std::vector<str> tokens = TokenizServerDirectives::split(line, "\t ");
+					if (tokens.size() != 2)
+						throw std::runtime_error("config file: you are allowed for one value per rule in each directive");
+					locations.insert(std::pair<str, str>(tokens[0],tokens[1]));//test
+					//TokenizServerDirectives::insert_locations(locations, tokens[0], tokens[1]);
+						//here i need to init a vector for the body of location and a map 
+				}
+				blockOFlocations.push_back(locations);
+			}
+			if (line.find('{') != std::string::npos && line != "location{")
+				throw std::runtime_error("config file:unkown directive in server context ");
+			std::vector<str> tokens = TokenizServerDirectives::split(line, "\t ");
+		//	if (tokens.size() != 2)
+		//		throw std::runtime_error("config file: you are allowed only for pairs of key and value per directive");
+			if (tokens[0] == "listen")
+				vsblock.port = static_cast<uint16_t>(std::strtoul(tokens[1].c_str(), 0, 10));
+			block.push_back(line);
+		}
+		//virtualServersParsing	vsblock;
+		vsblock.block = block;
+		vsblock.locations = blockOFlocations;
+		vsblock.host = "localhost";
+		config_vServers.push_back(vsblock);
+	}
 }
 
 static	bool	blocks_error(std::vector<str> &v_contents)
@@ -76,26 +139,20 @@ static bool	quotes_error(std::vector<str>& contents)
 	return true;
 }
 
-static bool	semicolon_error(std::vector<str>& contents)
+static bool	errors(std::vector<str>& contents)
 {
+	std::string allowed = "{} /#_.:\"'\t";
 	for (size_t i = 0; i<contents.size(); i++)
 	{
 		std::string line = contents[i];
-		if (line == "}")
-			continue;
-		if (line.find('{') != std::string::npos)
+		for (size_t j=0; j<line.size();j++)
 		{
-			if (line.find(';') != std::string::npos)
-				return true;
-			continue;
-		}
-		//size_t	id = line.length();
-		//size_t	id2 = line.find(';');
-		//if (id2 == std::string::npos || id != id2)
-		//	return true;
-		if (*line.rbegin() != ';')
+			if (std::isalnum(line[j]))
+				continue;
+			if (allowed.find(line[j]) != std::string::npos)
+				continue;
 			return true;
-
+		}
 	}
 	return false;
 }
@@ -132,11 +189,11 @@ bool	Config::check_syntax_error(std::vector<str>	&content)
 	std::vector<str> normalized_content = normalize(content);
 	if (blocks_error(normalized_content))
 		return true;
-		//throw std::runtime_error("blocks have a syntax error");
 	if (quotes_error(normalized_content))
 		return true;
-	if (semicolon_error(normalized_content))
+	if (errors(normalized_content))
 		return true;
+	tokenize_file_contents(normalized_content);
 	return false;
 }
 

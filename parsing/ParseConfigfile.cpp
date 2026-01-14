@@ -1,4 +1,4 @@
-#include "./../inc/ConfigParser.hpp"
+#include "./../inc/ServerDirTokenizer.hpp"
 
 
 //HttpTrafficParse::HttpTrafficParse(char*	file)
