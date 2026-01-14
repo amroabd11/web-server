@@ -9,3 +9,7 @@ obj
 test.*
 logs
 
+*.ico
+*.jpeg
+
+
