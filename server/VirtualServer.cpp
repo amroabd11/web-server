@@ -41,7 +41,7 @@ VirtualServer::VirtualServer(str host, int port, int epfd, const Config& config)
 
 
 	std::cout << "listening on " << host << ":" << port << " port is " << port << "\n";
-	std::cout << "test this --> " << host << ":" << port << "/index.html"<< "\n";
+	std::cout << "test this --> " << host << ":" << port << "/test.html"<< "\n";
 	std::cout << "test this --> " << host << ":" << port << "/images.jpeg"<< "\n";
 	std::cout << "test this --> " << host << ":" << port << "/test.py"<< "\n";
 	std::cout << "use command: nc " << host << " " << port << "\n";
