@@ -43,6 +43,7 @@ VirtualServer::VirtualServer(str host, int port, int epfd, const Config& config)
 	std::cout << "listening on " << host << ":" << port << " port is " << port << "\n";
 	std::cout << "test this --> " << host << ":" << port << "/index.html"<< "\n";
 	std::cout << "test this --> " << host << ":" << port << "/images.jpeg"<< "\n";
+	std::cout << "test this --> " << host << ":" << port << "/test.py"<< "\n";
 	std::cout << "use command: nc " << host << " " << port << "\n";
 }
 
@@ -58,9 +59,7 @@ VirtualServer::~VirtualServer()
 
 
 
-#include <iostream>
 #include <iomanip>
-#include <string>
 
 void logStringAsHex(str str)
 {
@@ -74,118 +73,52 @@ void logStringAsHex(str str)
     std::cout << std::dec << std::endl; // reset to decimal
 }
 
-str	long_to_str(long x)
-{
-	std::ostringstream oss;
-	oss << x;
-	return oss.str();
-}
-
-str	long_to_hexstr(long x)
-{
-	if (x <= 0) return "0";
-
-	str	result;
-	if (x >= 0x10)
-		result = long_to_hexstr(x >> 4);
-	result += "0123456789abcdef"[x & 0x0F];
-	return result;
-}
-
 // fill chunk with data
-void	fillChunk(HTTP_Req& request, responseChunk& chunck, str& file2Serv)
+void	VirtualServer::fillChunk(HTTP_Req& request, responseChunk& chunck, str& file2Serv)
 {
 	ssize_t		read_ret;
 	char		buffer[HTTPResponseBufferSize];
-	int			my_pipe[2];
-	char		*envp[request.queries.size()+1];
+	CGI			cgi(request.CGI);
 
 	if (request.GET_fd == -2)
-	{
-		if (request.CGI == HTML)
-			request.GET_fd = open(file2Serv.c_str(), 0);
-		else
-		{
-			if (pipe(my_pipe) < 0)
-				somethingWentWrongFunc("pipe");
-			request.GET_fd = my_pipe[0];
-			int i = 0;
-			for (QueriesIt it = request.queries.begin(); it != request.queries.end(); ++it)
-			{
+		request.GET_fd = cgi.prepareFd(request, file2Serv);
 
-				it->first += "=\"" + it->second + "\"";
-
-				envp[i++] = (char *)(it->first.c_str());
-				std::cout << "envp[i] --> " << i << envp[i-1] << "\n";
-			}
-			envp[i] = NULL;
-			// new process	--> request.CGI {file2Serv} 
-			// env			--> request queries
-
-			int pid = fork();
-			if (pid)
-			{
-				// parent
-				close(my_pipe[1]);
-			}
-			else
-			{
-				// child
-				close(my_pipe[0]);
-				dup2(my_pipe[1], STDOUT_FILENO);
-				close(my_pipe[1]);
-
-				char *argv[3];
-
-				argv[0] = (char*)("python");
-				argv[1] = (char*)(file2Serv.c_str());
-				argv[2] = NULL;
-
-				// char *envp[] = { NULL };
-
-				execve("/usr/bin/python", argv, envp);
-				somethingWentWrongFunc("execve");
-			}
-		}
-	}
 	//  check if open 
 	if (request.GET_fd == -1)
-	{
-		request.isResComplete = true;
 		chunck.status = HTTP_404;
-	}
 	else
 	{
 		if (request.sentResHead)
 		{
-			std::cout << "fd --> " << request.GET_fd << "\n";
 			read_ret = read(request.GET_fd, buffer, HTTPResponseBufferSize);
+			// std::cout << buffer << "\n";
 			
 			if (read_ret <= 0)
 				request.isResComplete = true;
 			else
 				chunck.data = str(buffer, read_ret);
-			chunck.status = HTTP_200;
+			chunck.size = long_to_hexstr(read_ret);
 		}
+		chunck.status = HTTP_200;
 	}
-	chunck.size = long_to_hexstr(read_ret);
 }
 
 // === Functions ===
-void		VirtualServer::serve(HTTP_Req& request)
+void		VirtualServer::serve(HTTP_Req& request, str status)
 {
-
 	str 		response;
-	str 		version = "HTTP/1.1";
+	str 		version = VERSION;
 	Headers		headers;
 	str			body;
 	str			file2Serv = this->vServConfig->root + request.route;
 
 	responseChunk	chunck;
 
+	// if (request.version != VERSION)
+
 	if (request.method == "GET")
 	{
-		fillChunk(request, chunck, file2Serv);
+		this->fillChunk(request, chunck, file2Serv);
 	}
 	
 	headers["Transfer-Encoding"] = "chunked";
@@ -193,16 +126,15 @@ void		VirtualServer::serve(HTTP_Req& request)
 
 	if (!request.sentResHead)
 	{
-		response = version + " " + chunck.status + CRLF;
+		request.responseStatus = chunck.status;
+		response = version + " " + ((status == HTTP_000) ? chunck.status : status) + CRLF;
 		for (HeadersIt it = headers.begin(); it != headers.end(); ++it)
 			response += it->first + ": " + it->second + CRLF;
 		request.sentResHead = true;
 		response += CRLF;
 	}
 	else
-	{
 		response = chunck.size + CRLF + chunck.data + CRLF;
-	}
 
 	if (request.isResComplete)
 	{
@@ -211,11 +143,32 @@ void		VirtualServer::serve(HTTP_Req& request)
 		response += CRLF;
 	}
 
-	// std::cout << "response ---> ;;;;" << body << ";;;;\n";
-	// std::cout << "response ---> ;;;;" << chunck.size  << ";;;;\n";
-
-	// logStringAsHex(response);
-
 	request.response = response;
 }
+
+void		VirtualServer::handleErrPages(HTTP_Req& request)
+{
+	str	status = request.responseStatus;
+	std::stringstream ss(status);
+	str	statusCode;
+
+	ss >> statusCode;
+	if (request.responseStatus == HTTP_404) // supported err codes
+	{
+		request = HTTP_Req();
+		request.method = "GET";
+		request.route = "/default_err_pages/" + statusCode + ".html";
+		request.version = VERSION;
+		request.sentResHead = false;
+		request.isReqComplete = true;
+		this->serve(request, status);
+		if (request.responseStatus == HTTP_404)
+		{
+			close(request.GET_fd);
+			request.GET_fd = -2;
+			request.response = str("0") + CRLF + CRLF;
+		}
+	}
+}
+
 

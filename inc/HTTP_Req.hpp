@@ -15,10 +15,12 @@ public:
 	bool		isReqComplete;
 	bool		isResComplete;
 	bool		sentResHead;
+	bool		servFileChanged;
+	str			responseStatus;
 
 	str			method; // "GET"
 	str			route; // "/"
-	str			version; // "HTTP/1.1"
+	str			version;
 
 	Headers		headers;
 	Queries		queries;
@@ -40,6 +42,10 @@ public:
 
 class responseChunk {
 public:
+
+	responseChunk();
+	~responseChunk();
+
 	str		size;
 	str		data;
 	str		status;

@@ -1,5 +1,11 @@
 
+.gitignore
+
 webserv
 obj
 *.swp
 *.swo
+
+test.*
+logs
+

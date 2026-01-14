@@ -23,10 +23,14 @@ typedef std::map<str, str>::iterator QueriesIt;
 // CGIs
 #define HTML (0)
 #define PYTHON (1)
-#define PHP (2)
+#define NODEJS (2)
 
 // more beautiful
 #define CRLF "\r\n"
+#define VERSION "HTTP/1.1"
+
+// 0xx – Edge cases
+#define HTTP_000 "000 NO STATUS"
 
 // 1xx – Informational
 #define HTTP_100 "100 Continue"

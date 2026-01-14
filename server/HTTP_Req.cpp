@@ -8,14 +8,18 @@ HTTP_Req::HTTP_Req()
 	isReqComplete = false;
 	isResComplete = false;
 	sentResHead = false;
+	servFileChanged = false;
 	GET_fd = -2;
 	POST_fd = -2;
+	CGI = HTML;
 }
-
 
 // === parsing and filling the object ===
 void	HTTP_Req::parse(char *rawBytes)
 {
+	// RESET 
+	*this = HTTP_Req();
+
 	str	request(rawBytes);
 	std::stringstream ss(request);
 	str	firstWord;
@@ -33,22 +37,31 @@ void	HTTP_Req::parse(char *rawBytes)
 	// }
 
 
-
 	ss >> this->method;
 	ss >> this->route;
 	ss >> this->version;
 
-	// this->method = "GET";
-	// this->route = "/index.html";
-	// this->version = "HTTP/1.1";
+	std::stringstream url_ss(this->route);
 
+	std::getline(url_ss, this->route, '?');
+	while (true)
+	{
+		str	key;
+		str	value;
+		if (
+			!std::getline(url_ss, key, '=') ||
+			!std::getline(url_ss, value, '&')
+		)
+			break ;
+		this->queries[key] = value;
+	}
 
 
 	this->headers["Host"] = "127.0.0.1:8201";
 	this->headers["Accept-Language"] = "en-US,en;q=0.6";
 
-	this->queries["test"] = "155";
-	this->queries["anothertest"] = "testing string";
+	// this->queries["test"] = "155";
+	// this->queries["anothertest"] = "testing string";
 
 	// this->CGI = HTML;
 	this->CGI = HTML;
@@ -60,4 +73,13 @@ void	HTTP_Req::parse(char *rawBytes)
 	this->isReqComplete = true;
 }
 
+
+
+responseChunk::responseChunk()
+{
+	size = "0";
+}
+responseChunk::~responseChunk()
+{
+}
 

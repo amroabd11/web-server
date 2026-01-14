@@ -6,10 +6,14 @@
 class CGI
 {
 private:
-    /* data */
+	str		interpreter;
+
 public:
-    CGI(/* args */);
-    ~CGI();
+	CGI(int cgi);
+	~CGI();
+
+	// utility
+	int		prepareFd(HTTP_Req& request, str& file2Serv);
 };
 
 #endif

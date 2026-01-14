@@ -39,4 +39,7 @@ public:
 
 };
 
+str		long_to_str(long x);
+str		long_to_hexstr(long x);
+
 #endif

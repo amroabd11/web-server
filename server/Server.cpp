@@ -1,6 +1,24 @@
 
 #include "../inc/Server.hpp"
 
+str	long_to_str(long x)
+{
+	std::ostringstream oss;
+	oss << x;
+	return oss.str();
+}
+
+str	long_to_hexstr(long x)
+{
+	if (x <= 0) return "0";
+
+	str	result;
+	if (x >= 0x10)
+		result = long_to_hexstr(x >> 4);
+	result += "0123456789abcdef"[x & 0x0F];
+	return result;
+}
+
 void	somethingWentWrongFunc(const char *syscall)
 {
 	std::cerr << syscall << ": ";
@@ -136,28 +154,26 @@ void	Server::run( void )
 				}
 				else if (events[i].events == EPOLLOUT)
 				{
-					std::cout << "responding" << std::endl;
+					// std::cout << "responding" << std::endl;
 					
 					requestServer = getServerAndReqOfClient[readyFd].first;
 					int	index = getServerAndReqOfClient[readyFd].second;
 					HTTP_Req	&req = requestServer->currentRequests[index];
-					requestServer->serve(req);
-					response = req.response;
-					
-					write(readyFd, response.c_str(), response.size());
 
-					std::cout << "========== back to reading ? " <<  req.isResComplete <<" ==========" << std::endl;
+					requestServer->serve(req, HTTP_000);
+					requestServer->handleErrPages(req);
+					write(readyFd, req.response.c_str(), req.response.size());
+
 					if (req.isResComplete)
 					{
 						// back to reading
-						std::cout << "========== back to reading ==========" << std::endl;
 						modifiedEvent.data.fd = readyFd;
 						modifiedEvent.events = EPOLLIN;
 						res = epoll_ctl(epfd, EPOLL_CTL_MOD, readyFd, &modifiedEvent);
 						if (res < 0)
 							somethingWentWrongFunc("epoll_ctl");
-
-					}
+					} else
+						continue ;
 				}
 				else
 				{
