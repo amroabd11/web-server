@@ -11,16 +11,15 @@ VirtualServer::VirtualServer(str host, int port, int epfd, const Config& config)
 		somethingWentWrongFunc("socket");
 		
 	// setsockopt
+	int opt = 1;
+	if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0)
+		somethingWentWrongFunc("setsockopt");
 	
 	struct sockaddr_in	addr;
 
 	addr.sin_family = AF_INET;
 	addr.sin_port = htons(port);
 	inet_aton(host.c_str(), &addr.sin_addr);
-
-	int opt;
-	setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
-	setsockopt(fd, SOL_SOCKET, SO_REUSEPORT, &opt, sizeof(opt));
 
 	res = bind(fd, (struct sockaddr *)&addr, sizeof(addr));
 	if (res < 0)
@@ -118,13 +117,24 @@ void		VirtualServer::serve(HTTP_Req& request, str status)
 
 	responseChunk	chunck;
 
-	// if (request.version != VERSION)
-
-	if (request.method == "GET")
+	if (request.version == VERSION)
 	{
-		this->fillChunk(request, chunck, file2Serv);
+		if (request.method == "GET")
+		{
+			this->fillChunk(request, chunck, file2Serv);
+		}
+		else
+		{
+			chunck.status = HTTP_405;
+			request.isResComplete = true;
+		}
 	}
-	
+	else
+	{
+		chunck.status = HTTP_400;
+		request.isResComplete = true;
+	}
+
 	headers["Transfer-Encoding"] = "chunked";
 	headers["Server"] = "dyali ana w p000py";
 
@@ -157,7 +167,7 @@ void		VirtualServer::handleErrPages(HTTP_Req& request)
 	str	statusCode;
 
 	ss >> statusCode;
-	if (request.responseStatus == HTTP_404) // supported err codes
+	if (request.responseStatus != HTTP_200) // supported err codes
 	{
 		request = HTTP_Req();
 		request.method = "GET";

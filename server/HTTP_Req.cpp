@@ -78,6 +78,7 @@ void	HTTP_Req::parse(char *rawBytes)
 responseChunk::responseChunk()
 {
 	size = "0";
+	
 }
 responseChunk::~responseChunk()
 {
