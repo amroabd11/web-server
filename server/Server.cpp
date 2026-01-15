@@ -154,15 +154,24 @@ void	Server::run( void )
 				}
 				else if (events[i].events == EPOLLOUT)
 				{
-					// std::cout << "responding" << std::endl;
+					std::cout << "responding" << std::endl;
 					
 					requestServer = getServerAndReqOfClient[readyFd].first;
 					int	index = getServerAndReqOfClient[readyFd].second;
 					HTTP_Req	&req = requestServer->currentRequests[index];
 
 					requestServer->serve(req, HTTP_000);
+					
+					std::cout << "===" << std::endl;
+					std::cout << req.response << std::endl;
+					std::cout << "===" << std::endl;
+
 					requestServer->handleErrPages(req);
 					write(readyFd, req.response.c_str(), req.response.size());
+
+					std::cout << "===" << std::endl;
+					std::cout << req.response << std::endl;
+					std::cout << "===" << std::endl;
 
 					if (req.isResComplete)
 					{

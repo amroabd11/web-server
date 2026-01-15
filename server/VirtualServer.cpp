@@ -42,7 +42,6 @@ VirtualServer::VirtualServer(str host, int port, int epfd, const Config& config)
 		somethingWentWrongFunc("epoll_ctl");
 
 
-
 	std::cout << "listening on " << host << ":" << port << " port is " << port << "\n";
 	std::cout << "test this --> " << host << ":" << port << "/test.html"<< "\n";
 	std::cout << "test this --> " << host << ":" << port << "/images.jpeg"<< "\n";
@@ -88,7 +87,10 @@ void	VirtualServer::fillChunk(HTTP_Req& request, responseChunk& chunck, str& fil
 
 	//  check if open 
 	if (request.GET_fd == -1)
+	{
 		chunck.status = HTTP_404;
+		request.isResComplete = true;
+	}
 	else
 	{
 		if (request.sentResHead)
@@ -97,7 +99,10 @@ void	VirtualServer::fillChunk(HTTP_Req& request, responseChunk& chunck, str& fil
 			// std::cout << buffer << "\n";
 			
 			if (read_ret <= 0)
+			{
+				chunck.status = HTTP_200;
 				request.isResComplete = true;
+			}
 			else
 				chunck.data = str(buffer, read_ret);
 			chunck.size = long_to_hexstr(read_ret);
@@ -140,6 +145,9 @@ void		VirtualServer::serve(HTTP_Req& request, str status)
 
 	if (!request.sentResHead)
 	{
+
+		// std::cout << "am here " << std::endl;
+
 		request.responseStatus = chunck.status;
 		response = version + " " + ((status == HTTP_000) ? chunck.status : status) + CRLF;
 		for (HeadersIt it = headers.begin(); it != headers.end(); ++it)
@@ -180,7 +188,7 @@ void		VirtualServer::handleErrPages(HTTP_Req& request)
 		{
 			close(request.GET_fd);
 			request.GET_fd = -2;
-			request.response = str("0") + CRLF + CRLF;
+			request.response += str("0") + CRLF + CRLF;
 		}
 	}
 }
