@@ -44,7 +44,7 @@ Server::Server(const Config& config)
 		str host = config.config_vServers[i].host;
 		
 		VirtualServer	vServ(host, port, epfd, config);
-		vServ.vServConfig = &config.vServers[i];
+		vServ.vServConfig = &config.config_vServers[i];
 		vServers.push_back(vServ);
 	}
 }

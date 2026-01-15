@@ -19,4 +19,3 @@ std::vector<std::string> TokenizServerDirectives::split(std::string line, std::s
 		tokens.push_back("");
 	return tokens;
 }
-
