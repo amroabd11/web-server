@@ -103,6 +103,7 @@ void	Config::tokenize_file_contents(std::vector<str>& content)
 		vsblock.block = block;
 		vsblock.locations = blockOFlocations;
 		vsblock.host = "localhost";
+		vsblock.root = "/home/ioulkhir/Desktop/WEBserv";
 		config_vServers.push_back(vsblock);
 	}
 }
