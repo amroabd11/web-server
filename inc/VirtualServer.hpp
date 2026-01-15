@@ -7,6 +7,7 @@
 #include "HTTP_Req.hpp"
 
 class	Config;
+struct	virtualServersParsing;
 
 class VirtualServer
 {

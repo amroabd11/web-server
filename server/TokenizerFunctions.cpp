@@ -19,12 +19,3 @@ std::vector<std::string> TokenizServerDirectives::split(std::string line, std::s
 		tokens.push_back("");
 	return tokens;
 }
-
-void	TokenizServerDirectives::insert_locations(std::map<str,str> locations, std::string token, std::string value)
-{
-	std::pair<std::map<str,str>::iterator, bool> res =locations.insert(std::make_pair(token, value));
-	if (!res.second)
-		throw std::runtime_error("Duplicate locations in config file" +token);
-	return res;
-}
-
