@@ -76,11 +76,19 @@ void logStringAsHex(str str)
 }
 
 // fill chunk with data
-void	VirtualServer::fillChunk(HTTP_Req& request, responseChunk& chunck, str& file2Serv)
+void	VirtualServer::handleGET_Req(HTTP_Req& request, Chunk& chunck, str& file2Serv)
 {
 	ssize_t		read_ret;
 	char		buffer[HTTPResponseBufferSize];
 	CGI			cgi(request.CGI);
+
+
+	if (request.version != VERSION)
+	{
+		chunck.status = HTTP_400;
+		request.isResComplete = true;
+		return ;
+	}
 
 	if (request.GET_fd == -2)
 		request.GET_fd = cgi.prepareFd(request, file2Serv);
@@ -110,6 +118,44 @@ void	VirtualServer::fillChunk(HTTP_Req& request, responseChunk& chunck, str& fil
 		chunck.status = HTTP_200;
 	}
 }
+// void	VirtualServer::handlePOST_Req(HTTP_Req& request, Chunk& chunck, str& file2Serv)
+// {
+// 	ssize_t		read_ret;
+// 	char		buffer[HTTPResponseBufferSize];
+// 	CGI			cgi(request.CGI);
+
+
+// 	if (request.version != VERSION)
+// 	{
+// 		chunck.status = HTTP_400;
+// 		request.isResComplete = true;
+// 		return ;
+// 	}
+
+// 	if (request.POST_fd == -2)
+// 		request.POST_fd = open(file2Serv, O_WRONLY | O_CREAT, 577);
+
+// 	//  check if open 
+// 	if (request.POST_fd == -1)
+// 	{
+// 		chunck.status = HTTP_404;
+// 		request.isResComplete = true;
+// 	}
+// 	else
+// 	{
+// 		if (request.sentResHead)
+// 		{
+// 			read_ret = write(request.POST_fd, chunck.data, HTTP_POST_ReqBufferSize);
+// 			if (read_ret <= 0)
+// 			{
+// 				chunck.status = HTTP_200;
+// 				request.isResComplete = true;
+// 			}
+// 			chunck.size = long_to_hexstr(read_ret);
+// 		}
+// 		chunck.status = HTTP_200;
+// 	}
+// }
 
 // === Functions ===
 void		VirtualServer::serve(HTTP_Req& request, str status)
@@ -120,34 +166,32 @@ void		VirtualServer::serve(HTTP_Req& request, str status)
 	str			body;
 	str			file2Serv = this->vServConfig->root + request.route;
 
-	responseChunk	chunck;
+	Chunk		chunck;
 
-	if (request.version == VERSION)
+
+	if (request.method == "GET")
 	{
-		if (request.method == "GET")
-		{
-			this->fillChunk(request, chunck, file2Serv);
-		}
-		else
-		{
-			chunck.status = HTTP_405;
-			request.isResComplete = true;
-		}
+		headers["Transfer-Encoding"] = "chunked";
+		this->handleGET_Req(request, chunck, file2Serv);
+		response = chunck.size + CRLF + chunck.data + CRLF;
 	}
+	// else if (request.method == "POST")
+	// {
+	// 	headers["Content-Length"] = "0";
+	// 	request.bodyStream.read(chunck.data, HTTP_POST_ReqBufferSize);
+	// 	this->handlePOST_Req(request, chunck, file2Serv);
+	// }
 	else
 	{
-		chunck.status = HTTP_400;
+		chunck.status = HTTP_405;
 		request.isResComplete = true;
 	}
 
-	headers["Transfer-Encoding"] = "chunked";
 	headers["Server"] = "dyali ana w p000py";
 
 	if (!request.sentResHead)
 	{
-
 		// std::cout << "am here " << std::endl;
-
 		request.responseStatus = chunck.status;
 		response = version + " " + ((status == HTTP_000) ? chunck.status : status) + CRLF;
 		for (HeadersIt it = headers.begin(); it != headers.end(); ++it)
@@ -155,8 +199,6 @@ void		VirtualServer::serve(HTTP_Req& request, str status)
 		request.sentResHead = true;
 		response += CRLF;
 	}
-	else
-		response = chunck.size + CRLF + chunck.data + CRLF;
 
 	if (request.isResComplete)
 	{
@@ -171,7 +213,7 @@ void		VirtualServer::serve(HTTP_Req& request, str status)
 void		VirtualServer::handleErrPages(HTTP_Req& request)
 {
 	str	status = request.responseStatus;
-	std::stringstream ss(status);
+	strStrm ss(status);
 	str	statusCode;
 
 	ss >> statusCode;

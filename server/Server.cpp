@@ -76,7 +76,6 @@ void	Server::run( void )
 	int						httpRequestIndex = 0;
 	VirtualServer			*requestServer;
 
-	std::cout << "before loop" << std::endl;
 
 	while (1)
 	{

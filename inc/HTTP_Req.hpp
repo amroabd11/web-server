@@ -8,6 +8,8 @@
 #include "stdIncludes.hpp"
 #include "typedefs.hpp"
 
+#include <sstream>
+
 class HTTP_Req {
 public:
 	// === DATA ===
@@ -32,19 +34,23 @@ public:
 	// fds
 	int			GET_fd;
 	int			POST_fd;
+	strStrm		bodyStream;
 	
 	// === parsing and filling the object ===
 	void	parse(char *rawBytes);
 
 	// === CONSTRUCTOR ===
 	HTTP_Req();
+	HTTP_Req(const HTTP_Req& other);
+	HTTP_Req& operator=(const HTTP_Req& other);
+	~HTTP_Req();
 };
 
-class responseChunk {
+class Chunk {
 public:
 
-	responseChunk();
-	~responseChunk();
+	Chunk();
+	~Chunk();
 
 	str		size;
 	str		data;

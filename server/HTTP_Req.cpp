@@ -14,14 +14,44 @@ HTTP_Req::HTTP_Req()
 	CGI = HTML;
 }
 
+HTTP_Req::HTTP_Req(const HTTP_Req& other)
+{
+	*this = other;
+}
+HTTP_Req& HTTP_Req::operator=(const HTTP_Req& other)
+{
+	this->isReqComplete = other.isReqComplete;
+	this->isResComplete = other.isResComplete;
+	this->sentResHead = other.sentResHead;
+	this->servFileChanged = other.servFileChanged;
+	this->responseStatus = other.responseStatus;
+
+	this->method = other.method; // "GET"
+	this->route = other.route; // "/"
+	this->version = other.version;
+
+	this->headers = other.headers;
+	this->queries = other.queries;
+	this->body = other.body;
+	this->CGI = other.CGI;
+	
+	this->response = other.response;
+
+	// fds
+	this->GET_fd = other.GET_fd;
+	this->POST_fd = other.POST_fd;
+	return *this;
+}
+HTTP_Req::~HTTP_Req() {}
+
 // === parsing and filling the object ===
 void	HTTP_Req::parse(char *rawBytes)
 {
 	// RESET 
-	*this = HTTP_Req();
+	HTTP_Req();
 
 	str	request(rawBytes);
-	std::stringstream ss(request);
+	strStrm ss(request);
 	str	firstWord;
 
 
@@ -41,7 +71,7 @@ void	HTTP_Req::parse(char *rawBytes)
 	ss >> this->route;
 	ss >> this->version;
 
-	std::stringstream url_ss(this->route);
+	strStrm url_ss(this->route);
 
 	std::getline(url_ss, this->route, '?');
 	while (true)
@@ -68,19 +98,20 @@ void	HTTP_Req::parse(char *rawBytes)
 	if (this->route == "/test.py")
 		this->CGI = PYTHON;
 	// PYTHON PHP
-	this->body = "";
+	// this->body = "";
+	this->bodyStream << this->body;
 
 	this->isReqComplete = true;
 }
 
 
 
-responseChunk::responseChunk()
+Chunk::Chunk()
 {
 	size = "0";
 	
 }
-responseChunk::~responseChunk()
+Chunk::~Chunk()
 {
 }
 

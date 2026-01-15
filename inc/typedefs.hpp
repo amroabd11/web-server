@@ -5,6 +5,7 @@
 #include "stdIncludes.hpp"
 
 typedef std::string str;
+typedef std::stringstream strStrm;
 typedef std::map<str, str> Headers;
 typedef std::map<str, str> Queries;
 typedef std::map<str, str>::iterator HeadersIt;
@@ -17,6 +18,7 @@ typedef std::map<str, str>::iterator QueriesIt;
 #define FD_NOT_SERVER -1
 #define HTTPRequestBufferSize 1024
 #define HTTPResponseBufferSize 1024
+#define HTTP_POST_ReqBufferSize 1024
 
 #define FD_IS_SERVER(x) x != FD_NOT_SERVER
 

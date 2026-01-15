@@ -29,7 +29,10 @@ public:
 	// === Functions ===
 	void		serve(HTTP_Req& request, str status);
 	void		handleErrPages(HTTP_Req& request);
-	void		fillChunk(HTTP_Req& request, responseChunk& chunck, str& file2Serv);
+
+	// Methods
+	void		handleGET_Req(HTTP_Req& request, Chunk& chunck, str& file2Serv);
+	void		handlePOST_Req(HTTP_Req& request, Chunk& chunck, str& file2Serv);
 
 };
 
