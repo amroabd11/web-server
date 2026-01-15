@@ -20,15 +20,15 @@ Config::Config(char *file)
 		nfile.close();
 		if (check_syntax_error(content))
 			throw std::runtime_error("config file syntax checking error ");
-	//	std::cout << config_vServers[0].port<<std::endl; 
+		std::cout << config_vServers[0].port<<std::endl; 
 	//	std::cout << config_vServers[0].host<<std::endl; 
 		//std::cout << config_vServers[0].block[0]<<std::endl; 
-		//std::cout << config_vServers.size()<<std::endl;
+		std::cout << config_vServers.size()<<std::endl;
 	//	std::map<str,str>& loc = config_vServers[0].locations[0];
 	//	std::map<str, str>::iterator it = loc.begin();
 	//	std::cout << it->first << "=" << it->second<<std::endl;
 		//std::cout << "++++++++++===============\n" ;
-		//std::cout << config_vServers[0].locations[0]["index"] << std::endl;
+		//std::cout << config_vServers[0].locations[0]["listen"] << std::endl;
 		//std::cout << config_vServers[0].locations.size() << std::endl;
 		//tokenize_file_contents(content);
 	} catch(std::exception& e){
@@ -77,33 +77,30 @@ void	Config::tokenize_file_contents(std::vector<str>& content)
 						inside2 = false;
 						break;
 					}
-					//std::cout << line<<std::endl;
 					if (line.find('{') != std::string::npos)
 						throw std::runtime_error("config file:unkwon directive inside location");
-					// fill_locations();
 					std::vector<str> tokens = TokenizServerDirectives::split(line, "\t ");
 					if (tokens.size() != 2)
 						throw std::runtime_error("config file: you are allowed for one value per rule in each directive");
-					locations.insert(std::pair<str, str>(tokens[0],tokens[1]));//test
-					//TokenizServerDirectives::insert_locations(locations, tokens[0], tokens[1]);
-						//here i need to init a vector for the body of location and a map 
+					locations.insert(std::pair<str, str>(tokens[0],tokens[1]));
 				}
 				blockOFlocations.push_back(locations);
 			}
 			if (line.find('{') != std::string::npos && line != "location{")
 				throw std::runtime_error("config file:unkown directive in server context ");
 			std::vector<str> tokens = TokenizServerDirectives::split(line, "\t ");
-		//	if (tokens.size() != 2)
-		//		throw std::runtime_error("config file: you are allowed only for pairs of key and value per directive");
+			if (tokens.size() != 2 && line.find('}'))
+				throw std::runtime_error("config file: you are allowed only for pairs of key and value per directive");
 			if (tokens[0] == "listen")
 				vsblock.port = static_cast<uint16_t>(std::strtoul(tokens[1].c_str(), 0, 10));
+			if (tokens[0] == "host")
+				vsblock.host = tokens[1];
+			if (tokens[0] == "root")
+				vsblock.root = tokens[1];
 			block.push_back(line);
 		}
-		//virtualServersParsing	vsblock;
 		vsblock.block = block;
 		vsblock.locations = blockOFlocations;
-		vsblock.host = "localhost";
-		vsblock.root = "/home/ioulkhir/Desktop/WEBserv";
 		config_vServers.push_back(vsblock);
 	}
 }
