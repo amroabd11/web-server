@@ -16,7 +16,6 @@ struct	virtualServersParsing
 	str			host;
 	str			root;
 	std::vector<std::map<str, str> > locations;
-	std::map<str, str>::iterator it;
 	//other directives;
 };
 
