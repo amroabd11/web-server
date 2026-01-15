@@ -17,9 +17,7 @@
 #include <stdexcept>
 #include <cerrno>
 #include <string.h>
+#include <string>
 #include <map>
-#include <sstream>
-#include <fstream>
-#include <fcntl.h>
 
 #endif

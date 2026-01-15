@@ -21,12 +21,12 @@ OBJ_DIRS = $(OBJ_DIR)/$(SERV) \
 
 # INC
 INC_DIR = inc
-INC_FILES = Configs.hpp Server.hpp stdIncludes.hpp typedefs.hpp
+INC_FILES = Configs.hpp Server.hpp stdIncludes.hpp typedefs.hpp ServerDirTokenizer.hpp
 INC = $(addprefix $(INC_DIR)/, $(INC_FILES))
 
 # Source Files
-SERV_FILES = Config.cpp HTTP_Req.cpp Server.cpp VirtualServer.cpp CGI.cpp
-PARS_FILES = test.cpp
+SERV_FILES = Config.cpp HTTP_Req.cpp Server.cpp VirtualServer.cpp TokenizerFunctions.cpp CGI.cpp
+PARS_FILES = ParseConfigfile.cpp test.cpp
 
 # SRC
 SRC = main.cpp \

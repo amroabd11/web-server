@@ -38,10 +38,10 @@ Server::Server(const Config& config)
 	if (epfd < 0)
 		somethingWentWrongFunc("epoll_create1");
 
-	for (unsigned long i = 0; i < config.vServers.size(); i++)
+	for (unsigned long i = 0; i < config.config_vServers.size(); i++)
 	{
-		int port = config.vServers[i].port;
-		str host = config.vServers[i].host;
+		int port = config.config_vServers[i].port;
+		str host = config.config_vServers[i].host;
 		
 		VirtualServer	vServ(host, port, epfd, config);
 		vServ.vServConfig = &config.vServers[i];
@@ -129,8 +129,8 @@ void	Server::run( void )
 					clientReqBuffer[clientReqSize] = '\0';
 					// and now comes parsing the req
 					// parse(buffer)
-					std::cout << "'" << clientReqBuffer << "'" << std::endl;
-
+					std::cout << clientReqBuffer << std::endl;
+					//parse_request(readyFd, clientReqBuffer);
 					// if parse returns 0  ----> a request is parsed and we need to respond
 					requestServer = getServerAndReqOfClient[readyFd].first;
 					int	index = getServerAndReqOfClient[readyFd].second;

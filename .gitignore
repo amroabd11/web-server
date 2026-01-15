@@ -6,7 +6,7 @@ obj
 *.swp
 *.swo
 
-test.*
+*test.*
 logs
 
 *.ico
