@@ -106,7 +106,7 @@ void	Server::run( void )
 
 				res = epoll_ctl(epfd, EPOLL_CTL_ADD, clientFd, &newEvent);
 				if (res < 0)
-					somethingWentWrongFunc("epoll_ctl");
+					somethingWentWrongFunc("epoll_ctl1");
 			}
 			else
 			{
@@ -114,7 +114,7 @@ void	Server::run( void )
 				{
 					// new HTTP Req
 					// it would be good to mesure the time read() spends on reading
-					clientReqSize = read(readyFd, clientReqBuffer, HTTPRequestBufferSize);
+					clientReqSize = read(readyFd, clientReqBuffer, HTTPRequestBufferSize-1);
 					if (clientReqSize < 0)
 						somethingWentWrongFunc("read");
 					else if (clientReqSize == 0)
@@ -129,6 +129,7 @@ void	Server::run( void )
 					// and now comes parsing the req
 					// parse(buffer)
 					std::cout << clientReqBuffer << std::endl;
+					
 					//parse_request(readyFd, clientReqBuffer);
 					// if parse returns 0  ----> a request is parsed and we need to respond
 					requestServer = getServerAndReqOfClient[readyFd].first;
@@ -137,13 +138,16 @@ void	Server::run( void )
 
 					req.parse(clientReqBuffer);
 
+
+					// req.isReqComplete = false; // deleteme
+					// means headers are complete and not completely the body
 					if (req.isReqComplete)
 					{
 						modifiedEvent.data.fd = readyFd;
 						modifiedEvent.events = EPOLLOUT;
 						res = epoll_ctl(epfd, EPOLL_CTL_MOD, readyFd, &modifiedEvent);
 						if (res < 0)
-							somethingWentWrongFunc("epoll_ctl");
+							somethingWentWrongFunc("epoll_ctl2");
 					} else
 					{
 						// if parse returns -1 ----> a request is incomplete
@@ -153,7 +157,7 @@ void	Server::run( void )
 				}
 				else if (events[i].events == EPOLLOUT)
 				{
-					std::cout << "responding" << std::endl;
+					// std::cout << "responding" << std::endl;
 					
 					requestServer = getServerAndReqOfClient[readyFd].first;
 					int	index = getServerAndReqOfClient[readyFd].second;
@@ -161,16 +165,16 @@ void	Server::run( void )
 
 					requestServer->serve(req, HTTP_000);
 					
-					std::cout << "===" << std::endl;
-					std::cout << req.response << std::endl;
-					std::cout << "===" << std::endl;
+					// std::cout << "===" << std::endl;
+					// std::cout << req.response << std::endl;
+					// std::cout << "===" << std::endl;
 
 					requestServer->handleErrPages(req);
 					write(readyFd, req.response.c_str(), req.response.size());
 
-					std::cout << "===" << std::endl;
-					std::cout << req.response << std::endl;
-					std::cout << "===" << std::endl;
+					// std::cout << "===" << std::endl;
+					// std::cout << req.response << std::endl;
+					// std::cout << "===" << std::endl;
 
 					if (req.isResComplete)
 					{
@@ -179,14 +183,11 @@ void	Server::run( void )
 						modifiedEvent.events = EPOLLIN;
 						res = epoll_ctl(epfd, EPOLL_CTL_MOD, readyFd, &modifiedEvent);
 						if (res < 0)
-							somethingWentWrongFunc("epoll_ctl");
+							somethingWentWrongFunc("epoll_ctl3");
 					} else
 						continue ;
 				}
-				else
-				{
-					// std::cout << "==========nigga pleasse ==========" << std::endl;
-				}
+					continue ;
 			}
 		}
 		

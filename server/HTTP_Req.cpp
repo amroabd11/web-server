@@ -44,62 +44,54 @@ HTTP_Req& HTTP_Req::operator=(const HTTP_Req& other)
 }
 HTTP_Req::~HTTP_Req() {}
 
-// === parsing and filling the object ===
-void	HTTP_Req::parse(char *rawBytes)
+void	setBadReq(HTTP_Req& request)
 {
-	// RESET 
-	HTTP_Req();
+	request.method = "GET";
+	request.version = "trigger 400 status code";
+}
+// === parsing and filling the object ===
+void	HTTP_Req::parse(char *_rawBytes)
+{
+	str			line;
+	size_t		currPos;
 
-	str	request(rawBytes);
-	strStrm ss(request);
-	str	firstWord;
+	// RESET if new Rick 
+	if (this->isReqComplete)
+		*this = HTTP_Req();
+
+	requestStr += _rawBytes;
+	if (requestStr.find(str(CRLF)+str(CRLF)) == str::npos)
+		return ;
+
+	currPos = requestStr.find(str(CRLF));
+	line = requestStr.substr(0, currPos);
+	requestStr = requestStr.substr(currPos + 2, str::npos);
+
+	strStrm	lineStream(line);
+	std::getline(lineStream, this->method , ' ');
+	std::getline(lineStream, this->route  , ' ');
+	std::getline(lineStream, this->version, ' ');
 
 
-	// GET, POST, and DELETE
-	// if (std::getline(ss, firstWord, ' '))
-	// {
-	// 	if (firstWord == "GET" || firstWord == "POST" || firstWord == "DELETE")
-	// 		this->method = firstWord;
-	// }
-	// else
-	// {
-		
-	// }
-
-
-	ss >> this->method;
-	ss >> this->route;
-	ss >> this->version;
-
-	strStrm url_ss(this->route);
-
-	std::getline(url_ss, this->route, '?');
 	while (true)
 	{
-		str	key;
-		str	value;
-		if (
-			!std::getline(url_ss, key, '=') ||
-			!std::getline(url_ss, value, '&')
-		)
+		if (requestStr == str(CRLF))
 			break ;
-		this->queries[key] = value;
+		currPos = requestStr.find(str(CRLF));
+		line = requestStr.substr(0, currPos);
+		requestStr = requestStr.substr(currPos + 2, str::npos);
+
+		// headers now
+		ssize_t	pos = line.find(": ");
+		str		key = line.substr(0, pos);
+		str		value = line.substr(pos+2, str::npos);
+		this->headers[key] = value;
 	}
 
+	// if (this->method == "POST")
+	// {
 
-	this->headers["Host"] = "127.0.0.1:8201";
-	this->headers["Accept-Language"] = "en-US,en;q=0.6";
-
-	// this->queries["test"] = "155";
-	// this->queries["anothertest"] = "testing string";
-
-	// this->CGI = HTML;
-	this->CGI = HTML;
-	if (this->route == "/test.py")
-		this->CGI = PYTHON;
-	// PYTHON PHP
-	// this->body = "";
-	this->bodyStream << this->body;
+	// }
 
 	this->isReqComplete = true;
 }
@@ -109,9 +101,7 @@ void	HTTP_Req::parse(char *rawBytes)
 Chunk::Chunk()
 {
 	size = "0";
-	
 }
 Chunk::~Chunk()
 {
 }
-

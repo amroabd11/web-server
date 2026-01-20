@@ -14,27 +14,29 @@ class HTTP_Req {
 public:
 	// === DATA ===
 	// flags
-	bool		isReqComplete;
-	bool		isResComplete;
-	bool		sentResHead;
-	bool		servFileChanged;
-	str			responseStatus;
+	bool				isReqComplete;
+	bool				isResComplete;
+	bool				sentResHead;
+	bool				servFileChanged;
+	str					responseStatus;
 
-	str			method; // "GET"
-	str			route; // "/"
-	str			version;
+	str					requestStr;
+	str					method; // "GET"
+	str					route; // "/"
+	str					version;
 
-	Headers		headers;
-	Queries		queries;
-	str			body;
-	int			CGI;
+	Headers				headers;
+	Queries				queries;
+	int					contentLength;
+	str					body;
+	int					CGI;
 	
-	str			response;
+	str					response;
 
 	// fds
-	int			GET_fd;
-	int			POST_fd;
-	strStrm		bodyStream;
+	int					GET_fd;
+	int					POST_fd;
+	strStrm				bodyStream;
 	
 	// === parsing and filling the object ===
 	void	parse(char *rawBytes);

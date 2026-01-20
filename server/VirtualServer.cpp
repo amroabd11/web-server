@@ -39,7 +39,7 @@ VirtualServer::VirtualServer(str host, int port, int epfd, const Config& config)
 
 	res = epoll_ctl(epfd, EPOLL_CTL_ADD, fd, &event);
 	if (res < 0)
-		somethingWentWrongFunc("epoll_ctl");
+		somethingWentWrongFunc("epoll_ctl4");
 
 
 	std::cout << "listening on " << host << ":" << port << " port is " << port << "\n";
@@ -82,7 +82,6 @@ void	VirtualServer::handleGET_Req(HTTP_Req& request, Chunk& chunck, str& file2Se
 	char		buffer[HTTPResponseBufferSize];
 	CGI			cgi(request.CGI);
 
-
 	if (request.version != VERSION)
 	{
 		chunck.status = HTTP_400;
@@ -107,10 +106,7 @@ void	VirtualServer::handleGET_Req(HTTP_Req& request, Chunk& chunck, str& file2Se
 			// std::cout << buffer << "\n";
 			
 			if (read_ret <= 0)
-			{
-				chunck.status = HTTP_200;
 				request.isResComplete = true;
-			}
 			else
 				chunck.data = str(buffer, read_ret);
 			chunck.size = long_to_hexstr(read_ret);
@@ -118,44 +114,46 @@ void	VirtualServer::handleGET_Req(HTTP_Req& request, Chunk& chunck, str& file2Se
 		chunck.status = HTTP_200;
 	}
 }
-// void	VirtualServer::handlePOST_Req(HTTP_Req& request, Chunk& chunck, str& file2Serv)
-// {
-// 	ssize_t		read_ret;
-// 	char		buffer[HTTPResponseBufferSize];
-// 	CGI			cgi(request.CGI);
+void	VirtualServer::handlePOST_Req(HTTP_Req& request, Chunk& chunck, str& file2Post)
+{
+	ssize_t		write_ret;
+
+	if (request.version != VERSION)
+	{
+		chunck.status = HTTP_400;
+		request.isResComplete = true;
+		return ;
+	}
 
 
-// 	if (request.version != VERSION)
-// 	{
-// 		chunck.status = HTTP_400;
-// 		request.isResComplete = true;
-// 		return ;
-// 	}
+	if (request.POST_fd == -2)
+		request.POST_fd = open(file2Post.c_str(), O_WRONLY | O_CREAT, 0644);
 
-// 	if (request.POST_fd == -2)
-// 		request.POST_fd = open(file2Serv, O_WRONLY | O_CREAT, 577);
+	std::cout << "creating " <<file2Post << " request.POST_fd-->  " << request.POST_fd << " ...\n";
+	//  check if open 
+	if (request.POST_fd == -1)
+	{
+		chunck.status = HTTP_404;
+		request.isResComplete = true;
+	}
+	else
+	{
+		write_ret = write(
+			request.POST_fd,
+			request.body.c_str(),
+			std::min(request.contentLength, HTTPResponseBufferSize)
+		);
+		// std::cout << buffer << "\n";
+		if (write_ret < 0)
+			somethingWentWrongFunc("write");
+		request.contentLength -= write_ret;
+		request.isResComplete |= (request.contentLength == 0);
+		request.sentResHead |= !request.isResComplete;
+		chunck.status = HTTP_201;
+	}
 
-// 	//  check if open 
-// 	if (request.POST_fd == -1)
-// 	{
-// 		chunck.status = HTTP_404;
-// 		request.isResComplete = true;
-// 	}
-// 	else
-// 	{
-// 		if (request.sentResHead)
-// 		{
-// 			read_ret = write(request.POST_fd, chunck.data, HTTP_POST_ReqBufferSize);
-// 			if (read_ret <= 0)
-// 			{
-// 				chunck.status = HTTP_200;
-// 				request.isResComplete = true;
-// 			}
-// 			chunck.size = long_to_hexstr(read_ret);
-// 		}
-// 		chunck.status = HTTP_200;
-// 	}
-// }
+
+}
 
 // === Functions ===
 void		VirtualServer::serve(HTTP_Req& request, str status)
@@ -164,23 +162,21 @@ void		VirtualServer::serve(HTTP_Req& request, str status)
 	str 		version = VERSION;
 	Headers		headers;
 	str			body;
-	str			file2Serv = this->vServConfig->root + request.route;
-
+	str			route = this->vServConfig->root + request.route;
 	Chunk		chunck;
-
 
 	if (request.method == "GET")
 	{
 		headers["Transfer-Encoding"] = "chunked";
-		this->handleGET_Req(request, chunck, file2Serv);
+		this->handleGET_Req(request, chunck, route);
 		response = chunck.size + CRLF + chunck.data + CRLF;
 	}
-	// else if (request.method == "POST")
-	// {
-	// 	headers["Content-Length"] = "0";
-	// 	request.bodyStream.read(chunck.data, HTTP_POST_ReqBufferSize);
-	// 	this->handlePOST_Req(request, chunck, file2Serv);
-	// }
+	else if (request.method == "POST")
+	{
+		headers["Content-Length"] = "0";
+		route += "/latestuploadedfile.txt";
+		this->handlePOST_Req(request, chunck, route);
+	}
 	else
 	{
 		chunck.status = HTTP_405;
@@ -202,8 +198,11 @@ void		VirtualServer::serve(HTTP_Req& request, str status)
 
 	if (request.isResComplete)
 	{
+		// no more wating for chuncks
 		close(request.GET_fd);
 		request.GET_fd = -2;
+		close(request.POST_fd);
+		request.POST_fd = -2;
 		response += CRLF;
 	}
 

@@ -1,4 +1,4 @@
-# Executable
+ # Executable
 NAME = webserv
 
 # Compilation
