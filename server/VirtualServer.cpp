@@ -84,7 +84,7 @@ void	VirtualServer::handleGET_Req(HTTP_Req& request, Chunk& chunck, str& file2Se
 
 	if (request.version != VERSION)
 	{
-		chunck.status = HTTP_400;
+		request.responseStatus = HTTP_400;
 		request.isResComplete = true;
 		return ;
 	}
@@ -95,7 +95,7 @@ void	VirtualServer::handleGET_Req(HTTP_Req& request, Chunk& chunck, str& file2Se
 	//  check if open 
 	if (request.GET_fd == -1)
 	{
-		chunck.status = HTTP_404;
+		request.responseStatus = HTTP_404;
 		request.isResComplete = true;
 	}
 	else
@@ -111,29 +111,27 @@ void	VirtualServer::handleGET_Req(HTTP_Req& request, Chunk& chunck, str& file2Se
 				chunck.data = str(buffer, read_ret);
 			chunck.size = long_to_hexstr(read_ret);
 		}
-		chunck.status = HTTP_200;
+		request.responseStatus = HTTP_200;
 	}
 }
-void	VirtualServer::handlePOST_Req(HTTP_Req& request, Chunk& chunck, str& file2Post)
+void	VirtualServer::handlePOST_Req(HTTP_Req& request, str& file2Post)
 {
 	ssize_t		write_ret;
 
 	if (request.version != VERSION)
 	{
-		chunck.status = HTTP_400;
+		request.responseStatus = HTTP_400;
 		request.isResComplete = true;
 		return ;
 	}
 
-
 	if (request.POST_fd == -2)
 		request.POST_fd = open(file2Post.c_str(), O_WRONLY | O_CREAT, 0644);
-
-	std::cout << "creating " <<file2Post << " request.POST_fd-->  " << request.POST_fd << " ...\n";
+	
 	//  check if open 
 	if (request.POST_fd == -1)
 	{
-		chunck.status = HTTP_404;
+		request.responseStatus = HTTP_404;
 		request.isResComplete = true;
 	}
 	else
@@ -141,22 +139,21 @@ void	VirtualServer::handlePOST_Req(HTTP_Req& request, Chunk& chunck, str& file2P
 		write_ret = write(
 			request.POST_fd,
 			request.body.c_str(),
-			std::min(request.contentLength, HTTPResponseBufferSize)
+			request.body.size()
 		);
-		// std::cout << buffer << "\n";
 		if (write_ret < 0)
 			somethingWentWrongFunc("write");
 		request.contentLength -= write_ret;
-		request.isResComplete |= (request.contentLength == 0);
-		request.sentResHead |= !request.isResComplete;
-		chunck.status = HTTP_201;
+		request.isResComplete |= (request.contentLength <= 0);
+		request.sentResHead &= !request.isResComplete;
+		request.responseStatus = HTTP_201;
 	}
 
 
 }
 
 // === Functions ===
-void		VirtualServer::serve(HTTP_Req& request, str status)
+void		VirtualServer::serve(HTTP_Req& request, str forcedStatus)
 {
 	str 		response;
 	str 		version = VERSION;
@@ -174,12 +171,12 @@ void		VirtualServer::serve(HTTP_Req& request, str status)
 	else if (request.method == "POST")
 	{
 		headers["Content-Length"] = "0";
-		route += "/latestuploadedfile.txt";
-		this->handlePOST_Req(request, chunck, route);
+		route += "/" + request.headers["X-Filename"];
+		this->handlePOST_Req(request, route);
 	}
 	else
 	{
-		chunck.status = HTTP_405;
+		request.responseStatus = HTTP_405;
 		request.isResComplete = true;
 	}
 
@@ -187,9 +184,8 @@ void		VirtualServer::serve(HTTP_Req& request, str status)
 
 	if (!request.sentResHead)
 	{
-		// std::cout << "am here " << std::endl;
-		request.responseStatus = chunck.status;
-		response = version + " " + ((status == HTTP_000) ? chunck.status : status) + CRLF;
+		std::cout << "am here " << std::endl;
+		response = version + " " + ((forcedStatus == HTTP_000) ? request.responseStatus : forcedStatus) + CRLF;
 		for (HeadersIt it = headers.begin(); it != headers.end(); ++it)
 			response += it->first + ": " + it->second + CRLF;
 		request.sentResHead = true;
@@ -223,7 +219,8 @@ void		VirtualServer::handleErrPages(HTTP_Req& request)
 		request.route = "/default_err_pages/" + statusCode + ".html";
 		request.version = VERSION;
 		request.sentResHead = false;
-		request.isReqComplete = true;
+		request.isReqHeadComplete = true;
+		// request.isReqBodyComplete = true;
 		this->serve(request, status);
 		if (request.responseStatus == HTTP_404)
 		{

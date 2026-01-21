@@ -19,7 +19,7 @@ void logStringAsHex(str str);
 #endif
 
 #define FD_NOT_SERVER -1
-#define HTTPRequestBufferSize 7
+#define HTTPRequestBufferSize 10
 #define HTTPResponseBufferSize 1024
 #define HTTP_POST_ReqBufferSize 1024
 

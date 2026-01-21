@@ -125,24 +125,22 @@ void	Server::run( void )
 						continue ;
 					}
 					
-					clientReqBuffer[clientReqSize] = '\0';
-					// and now comes parsing the req
-					// parse(buffer)
-					std::cout << clientReqBuffer << std::endl;
-					
 					//parse_request(readyFd, clientReqBuffer);
 					// if parse returns 0  ----> a request is parsed and we need to respond
 					requestServer = getServerAndReqOfClient[readyFd].first;
 					int	index = getServerAndReqOfClient[readyFd].second;
 					HTTP_Req	&req = requestServer->currentRequests[index];
 
-					req.parse(clientReqBuffer);
+					req.parse(str((const char *)clientReqBuffer, clientReqSize));
 
+					// std::cout << req.body << "BEGIN BODY\n";
+					// std::cout << req.body << "\n";
+					// std::cout << req.body << "END BODY\n";
 
-					// req.isReqComplete = false; // deleteme
 					// means headers are complete and not completely the body
-					if (req.isReqComplete)
+					if (req.isReqHeadComplete)
 					{
+						std::cout << "back to writeing" << std::endl;
 						modifiedEvent.data.fd = readyFd;
 						modifiedEvent.events = EPOLLOUT;
 						res = epoll_ctl(epfd, EPOLL_CTL_MOD, readyFd, &modifiedEvent);
@@ -164,21 +162,16 @@ void	Server::run( void )
 					HTTP_Req	&req = requestServer->currentRequests[index];
 
 					requestServer->serve(req, HTTP_000);
-					
-					// std::cout << "===" << std::endl;
-					// std::cout << req.response << std::endl;
-					// std::cout << "===" << std::endl;
-
-					requestServer->handleErrPages(req);
+					// requestServer->handleErrPages(req);
 					write(readyFd, req.response.c_str(), req.response.size());
 
-					// std::cout << "===" << std::endl;
-					// std::cout << req.response << std::endl;
-					// std::cout << "===" << std::endl;
+					std::cout << "===" << std::endl;
+					std::cout << req.response << std::endl;
+					std::cout << "===" << std::endl;
 
-					if (req.isResComplete)
+					if (req.isResComplete || (req.method == "POST"))
 					{
-						// back to reading
+						std::cout << "back to reading" << std::endl;
 						modifiedEvent.data.fd = readyFd;
 						modifiedEvent.events = EPOLLIN;
 						res = epoll_ctl(epfd, EPOLL_CTL_MOD, readyFd, &modifiedEvent);

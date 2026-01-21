@@ -5,13 +5,15 @@
 // === CONSTRUCTOR ===
 HTTP_Req::HTTP_Req()
 {
-	isReqComplete = false;
+	isReqHeadComplete = false;
+	isReqBodyComplete = false;
 	isResComplete = false;
 	sentResHead = false;
 	servFileChanged = false;
 	GET_fd = -2;
 	POST_fd = -2;
 	CGI = HTML;
+	contentLength = -1;
 }
 
 HTTP_Req::HTTP_Req(const HTTP_Req& other)
@@ -20,7 +22,7 @@ HTTP_Req::HTTP_Req(const HTTP_Req& other)
 }
 HTTP_Req& HTTP_Req::operator=(const HTTP_Req& other)
 {
-	this->isReqComplete = other.isReqComplete;
+	this->isReqHeadComplete = other.isReqHeadComplete;
 	this->isResComplete = other.isResComplete;
 	this->sentResHead = other.sentResHead;
 	this->servFileChanged = other.servFileChanged;
@@ -50,18 +52,33 @@ void	setBadReq(HTTP_Req& request)
 	request.version = "trigger 400 status code";
 }
 // === parsing and filling the object ===
-void	HTTP_Req::parse(char *_rawBytes)
+void	HTTP_Req::parse(str _rawBytes)
 {
 	str			line;
-	size_t		currPos;
+	size_t		currPos, headerEnd, bodyStart;
 
 	// RESET if new Rick 
-	if (this->isReqComplete)
-		*this = HTTP_Req();
+	// if (this->isReqBodyComplete)
+	// 	*this = HTTP_Req();
 
-	requestStr += _rawBytes;
-	if (requestStr.find(str(CRLF)+str(CRLF)) == str::npos)
+	if (this->isReqHeadComplete)
+	{
+		this->body = str(_rawBytes);
 		return ;
+	}
+	
+
+	requestStr += str(_rawBytes);
+	headerEnd = requestStr.find(str(CRLF)+str(CRLF));
+	if (headerEnd == str::npos)
+		return ;
+
+	bodyStart = headerEnd + 4;
+	this->body = requestStr.substr(bodyStart);
+	requestStr = requestStr.substr(0, bodyStart);
+
+	std::cout << "--head--"<<  requestStr << "--\n--";
+	std::cout << "--body--"<<  this->body << "--\n--";
 
 	currPos = requestStr.find(str(CRLF));
 	line = requestStr.substr(0, currPos);
@@ -88,12 +105,9 @@ void	HTTP_Req::parse(char *_rawBytes)
 		this->headers[key] = value;
 	}
 
-	// if (this->method == "POST")
-	// {
+	strStrm(this->headers["Content-Length"]) >> this->contentLength;
 
-	// }
-
-	this->isReqComplete = true;
+	this->isReqHeadComplete = true;
 }
 
 

@@ -14,7 +14,8 @@ class HTTP_Req {
 public:
 	// === DATA ===
 	// flags
-	bool				isReqComplete;
+	bool				isReqHeadComplete;
+	bool				isReqBodyComplete;
 	bool				isResComplete;
 	bool				sentResHead;
 	bool				servFileChanged;
@@ -39,7 +40,7 @@ public:
 	strStrm				bodyStream;
 	
 	// === parsing and filling the object ===
-	void	parse(char *rawBytes);
+	void	parse(str rawBytes);
 
 	// === CONSTRUCTOR ===
 	HTTP_Req();
