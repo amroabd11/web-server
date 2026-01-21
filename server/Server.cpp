@@ -34,17 +34,18 @@ const char*	Server::somethingWentWrong::what() const throw()
 
 Server::Server(const Config& config)
 {
+	vsParsed = config.getVservers();
 	this->epfd = epoll_create1(0);
 	if (epfd < 0)
 		somethingWentWrongFunc("epoll_create1");
 
-	for (unsigned long i = 0; i < config.config_vServers.size(); i++)
+	for (unsigned long i = 0; i < vsParsed.size(); i++)
 	{
-		int port = config.config_vServers[i].port;
-		str host = config.config_vServers[i].host;
+		int port = vsParsed[i].port;
+		str host = vsParsed[i].host;
 		
 		VirtualServer	vServ(host, port, epfd, config);
-		vServ.vServConfig = &config.config_vServers[i];
+		vServ.vServConfig = &vsParsed[i];
 		vServers.push_back(vServ);
 	}
 }

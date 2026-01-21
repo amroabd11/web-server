@@ -15,6 +15,7 @@ class Server {
 private:
 	// === UTILITY functions ===
 	unsigned long	isServerFd( int fd );
+	std::vector<virtualServersParsing> vsParsed;
 
 public:
 

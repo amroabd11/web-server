@@ -3,7 +3,7 @@ NAME = webserv
 
 # Compilation
 CC = c++
-COMPL_FLAGS = -Wall -Wextra -Werror -std=c++98
+COMPL_FLAGS = -Wall -Wextra -Werror -std=c++98 
 LINK_FLAGS = 
 # -g3 -fsanitize=address
 
@@ -21,12 +21,12 @@ OBJ_DIRS = $(OBJ_DIR)/$(SERV) \
 
 # INC
 INC_DIR = inc
-INC_FILES = Configs.hpp Server.hpp stdIncludes.hpp typedefs.hpp ServerDirTokenizer.hpp
+INC_FILES = Configs.hpp Server.hpp stdIncludes.hpp typedefs.hpp   SyntaxError.hpp Parser.hpp
 INC = $(addprefix $(INC_DIR)/, $(INC_FILES))
 
 # Source Files
-SERV_FILES = Config.cpp HTTP_Req.cpp Server.cpp VirtualServer.cpp TokenizerFunctions.cpp CGI.cpp
-PARS_FILES = ParseConfigfile.cpp test.cpp
+SERV_FILES =  HTTP_Req.cpp Server.cpp VirtualServer.cpp  CGI.cpp
+PARS_FILES =  SyntaxError.cpp Config.cpp Parser.cpp
 
 # SRC
 SRC = main.cpp \
