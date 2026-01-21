@@ -35,6 +35,7 @@ Config::Config(char *file)
 		file_contents = syntax_error.getContents();
 		Tokenizer tokens(file_contents);
 		vser_struct.block = tokens.getVStokens();
+		//std::cout << tokens.getVStokens()[3].value<<std::endl;
 		//config_vServers;
 		//std::cout << tokens.getVStokens()[4].value<<"----" << tokens.getVStokens()[5].value<< std::endl;
 	//	config_vServers.block = tokens.getVStokens();

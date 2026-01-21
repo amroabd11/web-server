@@ -14,7 +14,7 @@ class Parser
 {
 	public:
 		Parser(std::vector<virtualServersParsing> &vservers, std::vector<Token> &block);
-		typedef void(*handler_t)(virtualServersParsing&, size_t &);
+		typedef void(*handler_t)(virtualServersParsing&, size_t &, std::vector<Token>&);
 		typedef void(*handler_location_t)(location&, size_t &, std::vector<Token>&);
 		static void	parse_directive(std::vector<Token> &, location&);	
 		static std::map<std::string, handler_location_t> init_location_handler();

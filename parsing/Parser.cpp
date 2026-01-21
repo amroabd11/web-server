@@ -6,67 +6,68 @@ void expect(TokenType expected, Token &tok)
 		throw std::runtime_error("confg syntax error near: "+tok.value);
 }
 
-void	parse_listen(virtualServersParsing& vser, size_t &i)
+void	parse_listen(virtualServersParsing& vser, size_t &i, std::vector<Token>& block)
 {
-	expect(WORD, vser.block[++i]);
-	vser.host = vser.block[i].value;
-	expect(COLON, vser.block[++i]);
-	vser.port = std::atoi(vser.block[i].value.c_str());
+	expect(WORD, block[++i]);
+	vser.host = block[i].value;
+	expect(COLON, block[++i]);
+	expect(WORD, block[++i]);
+	vser.port = std::atoi(block[i].value.c_str());
 }
 
-void parse_root(virtualServersParsing& vser, size_t &i)
+void parse_root(virtualServersParsing& vser, size_t &i, std::vector<Token>& block)
 {
-	expect(WORD, vser.block[++i]);
-	vser.root = vser.block[i].value;
+	expect(WORD, block[++i]);
+	vser.root = block[i].value;
 }
 
-void	parse_autoindex(virtualServersParsing& vser, size_t &i)
+void	parse_autoindex(virtualServersParsing& vser, size_t &i,std::vector<Token>& block)
 {
-	expect(WORD, vser.block[++i]);
+	expect(WORD, block[++i]);
 	//vser.autoindex = vser.block[i].value;
-	if (vser.block[i].value == "off")
+	if (block[i].value == "off")
 		vser.autoindex = false;
 	else
 		vser.autoindex = true;
 }
 
-void	parse_error(virtualServersParsing& vser, size_t &i)
+void	parse_error(virtualServersParsing& vser, size_t &i, std::vector<Token>& block)
 {
-	expect(WORD, vser.block[++i]);
-	vser.error = vser.block[i].value;
+	expect(WORD, block[++i]);
+	vser.error = block[i].value;
 }
 
-void	parse_methods(virtualServersParsing& vser, size_t &i)
+void	parse_methods(virtualServersParsing& vser, size_t &i, std::vector<Token>& block)
 {
-	expect(WORD, vser.block[++i]);
-	while (i + 1 < vser.block.size() && vser.block[i+1].type == WORD)
-		vser.methods.push_back(vser.block[++i].value);
+	expect(WORD, block[++i]);
+	while (i + 1 < block.size() && block[i+1].type == WORD)
+		vser.methods.push_back(block[++i].value);
 }
 
-void	parse_index(virtualServersParsing& vser, size_t &i)
+void	parse_index(virtualServersParsing& vser, size_t &i, std::vector<Token>& block)
 {
-	expect(WORD, vser.block[++i]);
-	while (i + 1 < vser.block.size() && vser.block[i+1].type == WORD)
-		vser.index.push_back(vser.block[++i].value);
+	expect(WORD, block[++i]);
+	while (i + 1 < block.size() && block[i+1].type == WORD)
+		vser.index.push_back(block[++i].value);
 }
 
-void	parse_return(virtualServersParsing& vser, size_t& i)
+void	parse_return(virtualServersParsing& vser, size_t& i, std::vector<Token>& block)
 {
-	expect (WORD, vser.block[++i]);
-	vser.redir = vser.block[i].value;
+	expect (WORD, block[++i]);
+	vser.redir = block[i].value;
 }
 
-void	parse_body(virtualServersParsing& vser, size_t &i)
+void	parse_body(virtualServersParsing& vser, size_t &i, std::vector<Token>& block)
 {
-	expect(WORD, vser.block[++i]);
-	vser.body_size = std::strtoul(vser.block[i].value.c_str(), NULL, 0);
+	expect(WORD, block[++i]);
+	vser.body_size = std::strtoul(block[i].value.c_str(), NULL, 0);
 }
 
-void	parse_cgi(virtualServersParsing& vser, size_t &i)
+void	parse_cgi(virtualServersParsing& vser, size_t &i, std::vector<Token>& block)
 {
-	expect(WORD, vser.block[++i]);
-	while (i + 1 < vser.block.size() && vser.block[i+1].type == WORD)
-		vser.cgi.push_back(vser.block[++i].value);
+	expect(WORD, block[++i]);
+	while (i + 1 < block.size() && block[i+1].type == WORD)
+		vser.cgi.push_back(block[++i].value);
 }
 
 
@@ -194,6 +195,7 @@ static void	parse_locations(virtualServersParsing& vser, size_t &i, std::vector<
 		throw std::runtime_error("unclosed location block");
 	Parser::parse_directive(innerBlock, loc);
 	vser.locations.push_back(loc);
+	std::cout << "looooo"<<std::endl;
 }
 
 Parser::Parser(std::vector<virtualServersParsing> &vservers, std::vector<Token> &tokensBlock) //TODO it should be reimplemented 
@@ -213,16 +215,18 @@ Parser::Parser(std::vector<virtualServersParsing> &vservers, std::vector<Token> 
 			{
 				if (block[i].value == "location")
 				{
-			std::cout << block[i].value << "--->"<<block[i].type<<std::endl;
+			//std::cout << block[i].value << "--->"<<block[i].type<<std::endl;
 					parse_locations(vser, i, block);
 					continue;
 				}
 				if(block[i].type == WORD)
 				{
+			std::cout << block[i].value << "--->"<<block[i].type<<std::endl;
 					std::map<str, handler_t>::iterator it = handlers.find(block[i].value);
 					if (it == handlers.end())
 						throw std::runtime_error("unknown directive in config file");
-					it->second(vser, i);
+					it->second(vser, i,block);
+			std::cout << block[i].value << "--->"<<block[i].type<<std::endl;
 				}
 			}
 			vservers.push_back(vser);
