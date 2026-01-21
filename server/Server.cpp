@@ -101,7 +101,7 @@ void	Server::run( void )
 				vServers[vServerIdx].currentRequests.push_back(HTTP_Req());
 				getServerAndReqOfClient[clientFd] = std::make_pair(&vServers[vServerIdx], httpRequestIndex++);
 
-				std::cout << "new client --> " << clientFd << std::endl;
+				// std::cout << "new client --> " << clientFd << std::endl;
 
 
 				res = epoll_ctl(epfd, EPOLL_CTL_ADD, clientFd, &newEvent);
@@ -165,9 +165,9 @@ void	Server::run( void )
 					// requestServer->handleErrPages(req);
 					write(readyFd, req.response.c_str(), req.response.size());
 
-					std::cout << "===" << std::endl;
-					std::cout << req.response << std::endl;
-					std::cout << "===" << std::endl;
+					// std::cout << "===" << std::endl;
+					// std::cout << req.response << std::endl;
+					// std::cout << "===" << std::endl;
 
 					if (req.isResComplete || (req.method == "POST"))
 					{

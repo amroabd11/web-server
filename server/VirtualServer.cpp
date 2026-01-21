@@ -143,10 +143,21 @@ void	VirtualServer::handlePOST_Req(HTTP_Req& request, str& file2Post)
 		);
 		if (write_ret < 0)
 			somethingWentWrongFunc("write");
+		
+		long test;
+		strStrm(request.headers["Content-Length"]) >> test;
+
 		request.contentLength -= write_ret;
 		request.isResComplete |= (request.contentLength <= 0);
 		request.sentResHead &= !request.isResComplete;
 		request.responseStatus = HTTP_201;
+		
+		// if (file2Post == "/home/ioulkhir/Desktop/WEBserv/upload/arigato-gozaimasu-thank-you.gif")
+		// 	std::cout << "\t\t\t\t" << double(test-request.contentLength) / test * 100 << "% uploaded  \n";
+		// if (file2Post == "/home/ioulkhir/Desktop/WEBserv/upload/test.gif")
+		// 	std::cout << "\t\t\t\t\t\t" << double(test-request.contentLength) / test * 100 << "% uploaded  \n";
+		// else
+		// 	std::cout << "" << double(test-request.contentLength) / test * 100 << "% uploaded  \n";
 	}
 
 
@@ -184,7 +195,6 @@ void		VirtualServer::serve(HTTP_Req& request, str forcedStatus)
 
 	if (!request.sentResHead)
 	{
-		std::cout << "am here " << std::endl;
 		response = version + " " + ((forcedStatus == HTTP_000) ? request.responseStatus : forcedStatus) + CRLF;
 		for (HeadersIt it = headers.begin(); it != headers.end(); ++it)
 			response += it->first + ": " + it->second + CRLF;
@@ -220,7 +230,6 @@ void		VirtualServer::handleErrPages(HTTP_Req& request)
 		request.version = VERSION;
 		request.sentResHead = false;
 		request.isReqHeadComplete = true;
-		// request.isReqBodyComplete = true;
 		this->serve(request, status);
 		if (request.responseStatus == HTTP_404)
 		{

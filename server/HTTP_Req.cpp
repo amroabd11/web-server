@@ -6,7 +6,6 @@
 HTTP_Req::HTTP_Req()
 {
 	isReqHeadComplete = false;
-	isReqBodyComplete = false;
 	isResComplete = false;
 	sentResHead = false;
 	servFileChanged = false;
@@ -58,8 +57,8 @@ void	HTTP_Req::parse(str _rawBytes)
 	size_t		currPos, headerEnd, bodyStart;
 
 	// RESET if new Rick 
-	// if (this->isReqBodyComplete)
-	// 	*this = HTTP_Req();
+	if (this->isResComplete)
+		*this = HTTP_Req();
 
 	if (this->isReqHeadComplete)
 	{
@@ -77,8 +76,6 @@ void	HTTP_Req::parse(str _rawBytes)
 	this->body = requestStr.substr(bodyStart);
 	requestStr = requestStr.substr(0, bodyStart);
 
-	std::cout << "--head--"<<  requestStr << "--\n--";
-	std::cout << "--body--"<<  this->body << "--\n--";
 
 	currPos = requestStr.find(str(CRLF));
 	line = requestStr.substr(0, currPos);

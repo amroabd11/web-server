@@ -15,7 +15,6 @@ public:
 	// === DATA ===
 	// flags
 	bool				isReqHeadComplete;
-	bool				isReqBodyComplete;
 	bool				isResComplete;
 	bool				sentResHead;
 	bool				servFileChanged;
@@ -28,7 +27,7 @@ public:
 
 	Headers				headers;
 	Queries				queries;
-	int					contentLength;
+	long				contentLength;
 	str					body;
 	int					CGI;
 	
