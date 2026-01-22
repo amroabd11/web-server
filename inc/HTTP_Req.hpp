@@ -8,43 +8,51 @@
 #include "stdIncludes.hpp"
 #include "typedefs.hpp"
 
+#include <sstream>
+
 class HTTP_Req {
 public:
 	// === DATA ===
 	// flags
-	bool		isReqComplete;
-	bool		isResComplete;
-	bool		sentResHead;
-	bool		servFileChanged;
-	str			responseStatus;
+	bool				isReqHeadComplete;
+	bool				isResComplete;
+	bool				sentResHead;
+	bool				servFileChanged;
+	str					responseStatus;
 
-	str			method; // "GET"
-	str			route; // "/"
-	str			version;
+	str					requestStr;
+	str					method; // "GET"
+	str					route; // "/"
+	str					version;
 
-	Headers		headers;
-	Queries		queries;
-	str			body;
-	int			CGI;
+	Headers				headers;
+	Queries				queries;
+	long				contentLength;
+	str					body;
+	int					CGI;
 	
-	str			response;
+	str					response;
 
 	// fds
-	int			GET_fd;
-	int			POST_fd;
+	int					GET_fd;
+	int					POST_fd;
+	strStrm				bodyStream;
 	
 	// === parsing and filling the object ===
-	void	parse(char *rawBytes);
+	void	parse(str rawBytes);
 
 	// === CONSTRUCTOR ===
 	HTTP_Req();
+	HTTP_Req(const HTTP_Req& other);
+	HTTP_Req& operator=(const HTTP_Req& other);
+	~HTTP_Req();
 };
 
-class responseChunk {
+class Chunk {
 public:
 
-	responseChunk();
-	~responseChunk();
+	Chunk();
+	~Chunk();
 
 	str		size;
 	str		data;

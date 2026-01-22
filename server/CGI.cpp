@@ -22,7 +22,7 @@ int		CGI::prepareFd(HTTP_Req& request, str& file2Serv)
 	char		*argv[3];
 
 	if (this->interpreter.empty())
-		return open(file2Serv.c_str(), 0);
+		return open(file2Serv.c_str(), O_RDONLY);
 
 	if (pipe(my_pipe) < 0)
 		somethingWentWrongFunc("pipe");
