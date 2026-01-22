@@ -34,20 +34,22 @@ void	parse_autoindex(virtualServersParsing& vser, size_t &i,std::vector<Token>& 
 void	parse_error(virtualServersParsing& vser, size_t &i, std::vector<Token>& block)
 {
 	expect(WORD, block[++i]);
-	vser.error = block[i].value;
+	//vser.error = block[i].value;
+	while(i + 1< block.size() && block[i].type == WORD && block[i].type != COLON)
+		vser.error.push_back(block[++i].value);
 }
 
 void	parse_methods(virtualServersParsing& vser, size_t &i, std::vector<Token>& block)
 {
 	expect(WORD, block[++i]);
-	while (i + 1 < block.size() && block[i+1].type == WORD)
+	while (i + 1 < block.size() && block[i].type == WORD && block[i].type != COLON)
 		vser.methods.push_back(block[++i].value);
 }
 
 void	parse_index(virtualServersParsing& vser, size_t &i, std::vector<Token>& block)
 {
 	expect(WORD, block[++i]);
-	while (i + 1 < block.size() && block[i+1].type == WORD)
+	while (i + 1 < block.size() && block[i].type == WORD && block[i].type != COLON)
 		vser.index.push_back(block[++i].value);
 }
 
@@ -66,7 +68,7 @@ void	parse_body(virtualServersParsing& vser, size_t &i, std::vector<Token>& bloc
 void	parse_cgi(virtualServersParsing& vser, size_t &i, std::vector<Token>& block)
 {
 	expect(WORD, block[++i]);
-	while (i + 1 < block.size() && block[i+1].type == WORD)
+	while (i + 1 < block.size() && block[i].type == WORD && block[i].type != COLON)
 		vser.cgi.push_back(block[++i].value);
 }
 
@@ -87,7 +89,9 @@ void	parse_location_root(location& loc, size_t& i, std::vector<Token>& tok_block
 void	parse_location_error(location& loc, size_t& i, std::vector<Token>& tok_block)
 {
 	expect(WORD, tok_block[++i]);
-	loc.error = tok_block[i].value;
+	//loc.error = tok_block[i].value;
+	while (i+1 < tok_block.size() && tok_block[i].type == WORD && tok_block[i].type != COLON)
+		loc.error.push_back(tok_block[++i].value);
 }
 
 
@@ -102,7 +106,7 @@ void	parse_location_autoindex(location& loc, size_t& i, std::vector<Token>& tok_
 void	parse_location_methods(location& loc, size_t& i, std::vector<Token>& tok_block)
 {
 	expect(WORD, tok_block[++i]);
-	while (i +1 < tok_block.size() && tok_block[i].type == WORD)
+	while (i +1 < tok_block.size() && tok_block[i].type == WORD && tok_block[i].type != COLON)
 		loc.methods.push_back(tok_block[++i].value);
 }
 void	parse_location_return(location& loc, size_t& i, std::vector<Token>& tok_block)
@@ -113,7 +117,7 @@ void	parse_location_return(location& loc, size_t& i, std::vector<Token>& tok_blo
 void	parse_location_index(location& loc, size_t& i, std::vector<Token>& tok_block)
 {
 	expect(WORD, tok_block[++i]);
-	while (i +1 < tok_block.size() && tok_block[i].type == WORD)
+	while (i +1 < tok_block.size() && tok_block[i].type == WORD && tok_block[i].type != COLON)
 		loc.index.push_back(tok_block[++i].value);
 }
 
@@ -163,6 +167,7 @@ void Parser::parse_directive(std::vector<Token> &block, location &loc)
 	{
 		if (block[i].type != WORD)
 			continue;
+		//std::cout << "directives are::--> "<< block[i].value<<std::endl;
 		std::map<str, handler_location_t>::iterator it = handlers.find(block[i].value);
 		if (it == handlers.end())
 			throw std::runtime_error("invalid location directive in config file");
@@ -172,30 +177,37 @@ void Parser::parse_directive(std::vector<Token> &block, location &loc)
 
 static void	parse_locations(virtualServersParsing& vser, size_t &i, std::vector<Token>& block)
 {
+	//std::cout << "--------------------------------- inside location"<<std::endl;
 	location loc;
 	if (block[i].type != WORD || block[i].value != "location")
-		throw std::runtime_error("expected location dir");
+		throw std::runtime_error("expected location directive");
 	if (block[++i].type != WORD)
 		throw std::runtime_error("expected location path");
+	//std::cout<< "route is -------> "<< block[i].value<<std::endl;
 	loc.route = block[i].value;
 	if (block[++i].type != LBRACE)
-		throw std::runtime_error("expected '{' after path");
+		throw std::runtime_error("expected '{' after location path");
 	std::vector<Token> innerBlock;
 	int flag = 1;
-	while( ++i < block.size() && flag > 0)
+	while( ++i < block.size())
 	{
 		if (block[i].type == LBRACE)
 			flag++;
 		else if (block[i].type == RBRACE)
+		{
 			flag--;
+			if (flag == 0)
+				break ;
+		}
 		if (flag > 0)
 			innerBlock.push_back(block[i]);
 	}
-	if (flag !=0)
-		throw std::runtime_error("unclosed location block");
+//	std::cout<< innerBlock[7].value <<"--00000000000000000000000-"<< "sizeof blocks "<<block.size()<<std::endl;
+	//if (flag !=0)
+	//	throw std::runtime_error("unclosed location block");
 	Parser::parse_directive(innerBlock, loc);
 	vser.locations.push_back(loc);
-	std::cout << "looooo"<<std::endl;
+//	std::cout << "--------------------------------closing location"<<std::endl;
 }
 
 Parser::Parser(std::vector<virtualServersParsing> &vservers, std::vector<Token> &tokensBlock) //TODO it should be reimplemented 
@@ -204,29 +216,27 @@ Parser::Parser(std::vector<virtualServersParsing> &vservers, std::vector<Token> 
 	std::map<std::string, handler_t> handlers = init_server_handler();
 	for(size_t i = 0; i<block.size(); i++)
 	{
-		std::cout << block[i].value << block[i+1].value<< std::endl;
+//		std::cout << block[i].value << block[i+1].value<< std::endl;
 		if (block[i].value == "server")
 		{
-			std::cout << block[i].value << "--->"<<block[i].type<<std::endl;
+			//std::cout << block[i].value << "--->"<<block[i].type<<std::endl;
 			virtualServersParsing vser;
 			if (block[++i].type != LBRACE)
 				throw std::runtime_error("expected {' after server");
 			while (++i < block.size() && block[i].type != RBRACE)
 			{
+				//std::cout << block[i].value <<std::endl;
 				if (block[i].value == "location")
 				{
-			//std::cout << block[i].value << "--->"<<block[i].type<<std::endl;
 					parse_locations(vser, i, block);
 					continue;
 				}
 				if(block[i].type == WORD)
 				{
-			std::cout << block[i].value << "--->"<<block[i].type<<std::endl;
 					std::map<str, handler_t>::iterator it = handlers.find(block[i].value);
 					if (it == handlers.end())
 						throw std::runtime_error("unknown directive in config file");
 					it->second(vser, i,block);
-			std::cout << block[i].value << "--->"<<block[i].type<<std::endl;
 				}
 			}
 			vservers.push_back(vser);

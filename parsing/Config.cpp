@@ -7,7 +7,7 @@ Config::Config()
 	defaultvs.port = 8080;
 	defaultvs.host = "0.0.0.0";
 	defaultvs.root = "/app";
-	defaultvs.error = "/error_pages";
+	//defaultvs.error = "/error_pages";
 	defaultvs.autoindex = false;
 //	defaultvs.error = NULL;
 //	defaultvs.
@@ -39,8 +39,8 @@ Config::Config(char *file)
 		//config_vServers;
 		//std::cout << tokens.getVStokens()[4].value<<"----" << tokens.getVStokens()[5].value<< std::endl;
 	//	config_vServers.block = tokens.getVStokens();
+//		std::cout << tokens.getVStokens()[17].value<<std::endl;
 		Parser parse_tokens(config_vServers, tokens.getVStokens());
-
 	} catch(std::exception& e){
 		std::cout <<"config parser: "<< e.what()<<std::endl;
 		throw	Server::somethingWentWrong();

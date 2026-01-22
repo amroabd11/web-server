@@ -18,7 +18,7 @@ struct	location
 	str		route;
 	str		root;
 	bool	autoindex;
-	str	error;
+	std::vector<str>	error;
 	std::vector<str> index;
 	std::vector<str> methods;
 	std::string redir;
@@ -33,7 +33,7 @@ struct	virtualServersParsing
 	str		host;
 	str		root;
 	bool	autoindex;
-	str	error;
+	std::vector<str>	error;
 	std::vector<str> index;
 	std::vector<str> methods;
 	std::string redir;
