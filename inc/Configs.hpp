@@ -21,7 +21,7 @@ struct	location
 	std::vector<str>	error;
 	std::vector<str> index;
 	std::vector<str> methods;
-	std::string redir;
+	std::vector<str> redir;
 	size_t	body_size;
 //	std::vector<str> cgi;
 };
@@ -36,7 +36,7 @@ struct	virtualServersParsing
 	std::vector<str>	error;
 	std::vector<str> index;
 	std::vector<str> methods;
-	std::string redir;
+	std::vector<str> redir;
 	size_t	body_size;
 	std::vector<str> cgi;
 	std::vector<location> locations;

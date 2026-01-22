@@ -33,30 +33,44 @@ void	parse_autoindex(virtualServersParsing& vser, size_t &i,std::vector<Token>& 
 
 void	parse_error(virtualServersParsing& vser, size_t &i, std::vector<Token>& block)
 {
-	expect(WORD, block[++i]);
+//	expect(WORD, block[++i]);
 	//vser.error = block[i].value;
-	while(i + 1< block.size() && block[i].type == WORD && block[i].type != COLON)
-		vser.error.push_back(block[++i].value);
+	while(i + 1< block.size() && block[i+1].type == WORD && block[i+1].type != COLON)
+	{
+		expect(WORD, block[++i]);
+		vser.error.push_back(block[i].value);
+	}
 }
 
 void	parse_methods(virtualServersParsing& vser, size_t &i, std::vector<Token>& block)
 {
-	expect(WORD, block[++i]);
-	while (i + 1 < block.size() && block[i].type == WORD && block[i].type != COLON)
-		vser.methods.push_back(block[++i].value);
+	//expect(WORD, block[++i]);
+	while (i + 1 < block.size() && block[i+1].type == WORD && block[i+1].type != COLON)
+	{
+		expect(WORD, block[++i]);
+		vser.methods.push_back(block[i].value);
+	}
 }
 
 void	parse_index(virtualServersParsing& vser, size_t &i, std::vector<Token>& block)
 {
-	expect(WORD, block[++i]);
-	while (i + 1 < block.size() && block[i].type == WORD && block[i].type != COLON)
-		vser.index.push_back(block[++i].value);
+	//expect(WORD, block[++i]);
+	while (i + 1 < block.size() && block[i+1].type == WORD && block[i+1].type != COLON)
+	{
+		expect(WORD, block[++i]);
+		vser.index.push_back(block[i].value);
+	}
 }
 
 void	parse_return(virtualServersParsing& vser, size_t& i, std::vector<Token>& block)
 {
-	expect (WORD, block[++i]);
-	vser.redir = block[i].value;
+	//expect (WORD, block[++i]);
+//	vser.redir = block[i].value;
+	while(i +1< block.size() && block[i+1].type == WORD && block[i+1].type != COLON)
+	{
+		expect(WORD, block[++i]);
+		vser.redir.push_back(block[i].value);
+	}
 }
 
 void	parse_body(virtualServersParsing& vser, size_t &i, std::vector<Token>& block)
@@ -67,9 +81,12 @@ void	parse_body(virtualServersParsing& vser, size_t &i, std::vector<Token>& bloc
 
 void	parse_cgi(virtualServersParsing& vser, size_t &i, std::vector<Token>& block)
 {
-	expect(WORD, block[++i]);
-	while (i + 1 < block.size() && block[i].type == WORD && block[i].type != COLON)
-		vser.cgi.push_back(block[++i].value);
+	//expect(WORD, block[++i]);
+	while (i + 1 < block.size() && block[i+1].type == WORD && block[i+1].type != COLON)
+	{
+		expect(WORD, block[++i]);
+		vser.cgi.push_back(block[i].value);
+	}
 }
 
 
@@ -88,10 +105,13 @@ void	parse_location_root(location& loc, size_t& i, std::vector<Token>& tok_block
 
 void	parse_location_error(location& loc, size_t& i, std::vector<Token>& tok_block)
 {
-	expect(WORD, tok_block[++i]);
+	//expect(WORD, tok_block[++i]);
 	//loc.error = tok_block[i].value;
-	while (i+1 < tok_block.size() && tok_block[i].type == WORD && tok_block[i].type != COLON)
-		loc.error.push_back(tok_block[++i].value);
+	while (i+1 < tok_block.size() && tok_block[i+1].type == WORD && tok_block[i+1].type != COLON)
+	{
+		expect(WORD, tok_block[++i]);
+		loc.error.push_back(tok_block[i].value);
+	}
 }
 
 
@@ -105,20 +125,31 @@ void	parse_location_autoindex(location& loc, size_t& i, std::vector<Token>& tok_
 }
 void	parse_location_methods(location& loc, size_t& i, std::vector<Token>& tok_block)
 {
-	expect(WORD, tok_block[++i]);
-	while (i +1 < tok_block.size() && tok_block[i].type == WORD && tok_block[i].type != COLON)
-		loc.methods.push_back(tok_block[++i].value);
+	//expect(WORD, tok_block[++i]);
+	while (i +1 < tok_block.size() && tok_block[i+1].type == WORD && tok_block[i+1].type != COLON)
+	{
+		expect(WORD, tok_block[++i]);
+		loc.methods.push_back(tok_block[i].value);
+	}
 }
 void	parse_location_return(location& loc, size_t& i, std::vector<Token>& tok_block)
 {
-	expect(WORD, tok_block[++i]);
-	loc.redir = tok_block[i].value;
+//	expect(WORD, tok_block[++i]);
+	//loc.redir = tok_block[i].value;
+	while (i + 1<tok_block.size() && tok_block[i+1].type == WORD && tok_block[i+1].type != COLON)
+	{
+		expect(WORD, tok_block[++i]);
+		loc.redir.push_back(tok_block[i].value);
+	}
 }
 void	parse_location_index(location& loc, size_t& i, std::vector<Token>& tok_block)
 {
 	expect(WORD, tok_block[++i]);
-	while (i +1 < tok_block.size() && tok_block[i].type == WORD && tok_block[i].type != COLON)
-		loc.index.push_back(tok_block[++i].value);
+	while (i +1 < tok_block.size() && tok_block[i+1].type == WORD && tok_block[i+1].type != COLON)
+	{
+		expect(WORD, tok_block[++i]);
+		loc.index.push_back(tok_block[i].value);
+	}
 }
 
 void 	parse_location_body(location& loc, size_t& i, std::vector<Token>& tok_block)
