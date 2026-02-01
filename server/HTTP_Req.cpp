@@ -53,8 +53,6 @@ void	setBadReq(HTTP_Req& request)
 // === parsing and filling the object ===
 void	HTTP_Req::parse(str _rawBytes)
 {
-	str			line;
-	size_t		currPos, headerEnd, bodyStart;
 
 	// RESET if new Rick 
 	if (this->isResComplete)
@@ -67,42 +65,19 @@ void	HTTP_Req::parse(str _rawBytes)
 	}
 	
 
-	requestStr += str(_rawBytes);
-	headerEnd = requestStr.find(str(CRLF)+str(CRLF));
-	if (headerEnd == str::npos)
+	requestStr += str(_rawBytes); // THIS  is for chuncked requests
+	size_t _header_end = requestStr.find(str(CRLF) + str(CRLF)); 
+	if (_header_end == str::npos)
 		return ;
 
-	bodyStart = headerEnd + 4;
-	this->body = requestStr.substr(bodyStart);
-	requestStr = requestStr.substr(0, bodyStart);
-
-
-	currPos = requestStr.find(str(CRLF));
-	line = requestStr.substr(0, currPos);
-	requestStr = requestStr.substr(currPos + 2, str::npos);
-
-	strStrm	lineStream(line);
-	std::getline(lineStream, this->method , ' ');
-	std::getline(lineStream, this->route  , ' ');
-	std::getline(lineStream, this->version, ' ');
-
-
-	while (true)
-	{
-		if (requestStr == str(CRLF))
-			break ;
-		currPos = requestStr.find(str(CRLF));
-		line = requestStr.substr(0, currPos);
-		requestStr = requestStr.substr(currPos + 2, str::npos);
-
-		// headers now
-		ssize_t	pos = line.find(": ");
-		str		key = line.substr(0, pos);
-		str		value = line.substr(pos+2, str::npos);
-		this->headers[key] = value;
-	}
-
-	strStrm(this->headers["Content-Length"]) >> this->contentLength;
+	ReqTokenizer _req_tokens(requestStr);
+	method = _req_tokens.start_line[0];
+	route = _req_tokens.start_line[1];
+	version = _req_tokens.start_line[2];
+	strStrm(headers["Content-Length"]) >> contentLength;
+	strStrm(headers["Host"])>> _host_name;
+	parsingerr = _req_tokens.error;
+	//AA server MUST reject any received request message that contains whitespace between a header field name and colon with a response 400bad request
 
 	this->isReqHeadComplete = true;
 }

@@ -1,6 +1,6 @@
 #include "./../inc/Configs.hpp"
 
-Config::Config()
+Config::Config() //TODO it still needs to implement some default params
 {
 	virtualServersParsing defaultvs;
 	memset(&defaultvs, 0, sizeof(defaultvs));
