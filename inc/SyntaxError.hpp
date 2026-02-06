@@ -20,11 +20,11 @@ struct Context
 
 enum TokenType
 {
-	WORD,
 	LBRACE,
-	COLON,
+	RBRACE,
 	SEMI_COLON,
-	RBRACE
+	WORD,
+	COLON
 };
 
 class Token

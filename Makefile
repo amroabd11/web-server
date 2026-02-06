@@ -21,12 +21,12 @@ OBJ_DIRS = $(OBJ_DIR)/$(SERV) \
 
 # INC
 INC_DIR = inc
-INC_FILES = Configs.hpp Server.hpp stdIncludes.hpp typedefs.hpp   SyntaxError.hpp Parser.hpp
+INC_FILES = Configs.hpp Server.hpp stdIncludes.hpp typedefs.hpp   SyntaxError.hpp Parser.hpp ReqTokenizer.hpp
 INC = $(addprefix $(INC_DIR)/, $(INC_FILES))
 
 # Source Files
 SERV_FILES =  HTTP_Req.cpp Server.cpp VirtualServer.cpp  CGI.cpp
-PARS_FILES =  SyntaxError.cpp Config.cpp Parser.cpp
+PARS_FILES =  SyntaxError.cpp Config.cpp Parser.cpp ReqTokenizer.cpp   
 
 # SRC
 SRC = main.cpp \

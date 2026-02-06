@@ -69,15 +69,22 @@ void	HTTP_Req::parse(str _rawBytes)
 	size_t _header_end = requestStr.find(str(CRLF) + str(CRLF)); 
 	if (_header_end == str::npos)
 		return ;
-
-	ReqTokenizer _req_tokens(requestStr);
-	method = _req_tokens.start_line[0];
-	route = _req_tokens.start_line[1];
-	version = _req_tokens.start_line[2];
-	strStrm(headers["Content-Length"]) >> contentLength;
-	strStrm(headers["Host"])>> _host_name;
-	parsingerr = _req_tokens.error;
-	//AA server MUST reject any received request message that contains whitespace between a header field name and colon with a response 400bad request
+	try{
+		ReqTokenizer _req_tokens(requestStr);
+		method = _req_tokens.getReqLine()[0];
+		route = _req_tokens.getReqLine()[1];
+		version = _req_tokens.getReqLine()[2];
+	//	contentLength = _req_tokens.getHeaders()["Content-Length"];
+		_host_name = _req_tokens.getHeaders()["Host"];
+		strStrm(_req_tokens.getHeaders()["Content-Length"]) >> contentLength;
+	//	strStrm(_req_tokens.getHeaders()["Host"])>> _host_name;
+		parsingerr = _req_tokens.error;
+		//std::cout << parsingerr<<std::endl;
+	}
+	catch(const std::exception& e){
+		std::cout << e.what() <<std::endl;
+		return ;
+	}
 
 	this->isReqHeadComplete = true;
 }

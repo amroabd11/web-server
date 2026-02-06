@@ -11,6 +11,7 @@ typedef std::map<str, str> Queries;
 typedef std::map<str, str>::iterator HeadersIt;
 typedef std::map<str, str>::iterator QueriesIt;
 
+
 //  DEGUGGING
 void logStringAsHex(str str);
 
@@ -18,6 +19,8 @@ void logStringAsHex(str str);
 #define MAX_EVENTS 1024
 #endif
 
+#define IS_SP(x) (x ==' ' || x =='\t')
+#define IS_CTL(x) (x =='\r' || x =='\n')
 #define FD_NOT_SERVER -1
 #define HTTPRequestBufferSize 10
 #define HTTPResponseBufferSize 1024

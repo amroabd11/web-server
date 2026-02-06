@@ -30,9 +30,9 @@ public:
 	Headers				headers;
 	Queries				queries;
 	long				contentLength;
-	std::vector<str>	Transfer-Encoding;
+	std::vector<str>	TransferEncoding;
 
-	str					parsingerr; //HTTP_000 by default no error 
+	str					parsingerr; 
 
 	str	_host_name;
 	str					body;
