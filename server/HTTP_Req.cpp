@@ -74,21 +74,23 @@ void	HTTP_Req::parse(str _rawBytes)
 		method = _req_tokens.getReqLine()[0];
 		route = _req_tokens.getReqLine()[1];
 		version = _req_tokens.getReqLine()[2];
-	//	contentLength = _req_tokens.getHeaders()["Content-Length"];
+
+		//std::cout << route <<std::endl;
 		_host_name = _req_tokens.getHeaders()["Host"];
-		if (_host_name.empty())
-		{
-			parsingerr = HTTP_400;
-			return ;
-		}
-		
+	//	if (_host_name.empty())
+	//	{
+	//		parsingerr = HTTP_400;
+	//		return ;
+	//	}
+	//	headers = _req_tokens.getHeaders();
 		strStrm(_req_tokens.getHeaders()["Content-Length"]) >> contentLength;
-		//std::cout <<"contentlength in server "<< contentLength<<std::endl;
+	//	std::cout <<"contentlength in server "<< contentLength<<std::endl;
 		//std::cout <<"connection : << "<< _req_tokens.getHeaders()["Connection"]<<std::endl;
 		parsingerr = _req_tokens.error;
+		//this->body = _req_tokens.body;
 	}
 	catch(const std::exception& e){
-		std::cout << e.what() <<std::endl;
+//		std::cout << e.what() <<std::endl;
 		return ;
 	}
 

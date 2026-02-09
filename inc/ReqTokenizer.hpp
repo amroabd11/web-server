@@ -33,6 +33,7 @@ class	ReqTokenizer
 		~ReqTokenizer();
 //		void	*headers_error();
 		str	error;
+		str	body;
 		str	handle_postReq(str&);
 		void	handle_getReq(size_t& );
 		bool	tokenized(str&);

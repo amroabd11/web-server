@@ -29,13 +29,15 @@ ReqTokenizer::ReqTokenizer(str &_bytes)
 	_h_end_pos += 4;
 
 	error = HTTP_000;
-	size_t curr_pos = _bytes.find(str(CRLF));
+	size_t curr_pos = _bytes.find("\r\n");
+	if (curr_pos== str::npos)
+		throw std::runtime_error("errrrrrrror");
 	str	startline = _bytes.substr(0, curr_pos);
 	
 	for (size_t i = 0; i < startline.size(); i++)
 	{
 		size_t start = i;
-		if (startline[i] == '\r' && startline[i +1] == '\n')
+		if ((i+1 < startline.size()) && (startline[i] == '\r' && startline[i +1] == '\n'))
 			break ;
 		if (startline[0] == ' ' || startline[0] == '\t')
 		{
@@ -46,7 +48,7 @@ ReqTokenizer::ReqTokenizer(str &_bytes)
 			continue;
 		while (!IS_SP(startline[i]))
 			i++;
-		start_line.push_back(startline.substr(start, i));
+		start_line.push_back(startline.substr(start, i-start));
 	}
 
 	if (start_line.size() != 3)
@@ -65,24 +67,22 @@ ReqTokenizer::ReqTokenizer(str &_bytes)
 		throw std::runtime_error("tokenizing error");
 	}
 
-
 	for (size_t i = 0; i< _req_tokens.size(); i++)
 	{
 		str fieldName;
 //		std::cout << _req_tokens[i].value<< "-----------> type: "<< _req_tokens[i]._tk_type<<std::endl;
 	
-		if (_req_tokens[i]._tk_type == WORD1 && _req_tokens[i+1]._tk_type == COLON1 && _req_tokens[i+2]._tk_type == OSP)
+		if ((i+2 < _req_tokens.size() && i+1 < _req_tokens.size()) && (_req_tokens[i]._tk_type == WORD1 && _req_tokens[i+1]._tk_type == COLON1 && _req_tokens[i+2]._tk_type == OSP))
 		{
 			fieldName = _req_tokens[i].value;
 			i+=3;
 		}
-		else if(_req_tokens[i]._tk_type == RSP)
-			continue;
+	//	else if(_req_tokens[i]._tk_type == RSP)
+	//		continue;
 		else if (_req_tokens[i]._tk_type == BSP)
 			break;
 		else
 		{
-//			std::cout << _req_tokens[i].value<<"---type: "<<_req_tokens[i]._tk_type<< std::endl;
 			throw std::runtime_error("the only handled header's syntax as: field:OSP value OSP RSP");
 		}
 		if (_req_tokens[i]._tk_type == WORD1)
@@ -90,6 +90,7 @@ ReqTokenizer::ReqTokenizer(str &_bytes)
 		else
 			throw std::runtime_error("error: correctSYNTAX:headers token:OSPvalueOSPcrlf");
 	}
+	//body = _bytes.substr(_h_end_pos+4);
 //	if (start_line[0] == "POST")
 //	{
 //		error = handle_postReq(headers);
@@ -104,7 +105,7 @@ ReqTokenizer::~ReqTokenizer()
 
 bool ReqTokenizer::tokenized(str& headers)
 {
-	std::cout << headers.size()<<std::endl;
+//	std::cout << headers.size()<<std::endl;
 	for(size_t i = 0; i<headers.size();i++)
 	{
 		if (i +3<headers.size() && headers[i] == '\r' && headers[i+1] == '\n' && headers[i+2] == '\r' && headers[i+3] == '\n')
@@ -124,11 +125,15 @@ bool ReqTokenizer::tokenized(str& headers)
 			return true;
 		if(IS_SP(line[0]))
 		{
-			error = HTTP_404;
-			//std::cout << "why here "<<std::endl;
+			error = HTTP_400;
 			return false;
 		}
 		size_t cur_pos = line.find(':');
+		if (cur_pos == str::npos)
+		{
+			error = HTTP_400;
+			return false;
+		}
 		
 		str token = line.substr(0, cur_pos);
 		if (token.find(' ') != str::npos)
