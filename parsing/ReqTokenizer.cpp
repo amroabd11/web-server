@@ -6,7 +6,7 @@ static str firstLine_syntax(std::vector<str> &startLine)
 	
 	if (startLine[0] != "POST" && startLine[0] != "GET" && startLine[0] != "DELETE")
 		return HTTP_405;
-	if (startLine[1].find(".") != std::string::npos || startLine[1].find("..") != std::string::npos)
+	if (startLine[1].find("./") != std::string::npos || startLine[1].find("..") != std::string::npos)
 		return HTTP_404;
 	if (startLine[2] != "HTTP/1.1")
 		return HTTP_400;
@@ -55,7 +55,7 @@ ReqTokenizer::ReqTokenizer(str &_bytes)
 		throw std::runtime_error("error in request line form");
 	}
 	error = firstLine_syntax(start_line);
-	std::cout << error<<std::endl;
+//	std::cout << error<<std::endl;
 	if (error != HTTP_000)
 		 throw std::runtime_error("error in firstLine_syntax");
 	str	headers = _bytes.substr(curr_pos + 2, _h_end_pos);
@@ -158,9 +158,9 @@ bool ReqTokenizer::tokenized(str& headers)
 			}
 			else
 			{
-				if (value[j] == ':')
-					start+=1;
-				while (j<value.size() - 1)
+			//	if (value[j] == ':')
+			//		start+=1;
+				while (j<value.size())
 					j++;
 		//		std::cout << value.substr(start, j)<<std::endl;
 				ReqToken wordValue(WORD1, value.substr(start, j-start));
