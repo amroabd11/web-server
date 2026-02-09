@@ -163,7 +163,7 @@ void	Server::run( void )
 					HTTP_Req	&req = requestServer->currentRequests[index];
 
 					requestServer->serve(req, req.parsingerr);
-					// requestServer->handleErrPages(req);
+					requestServer->handleErrPages(req);
 					write(readyFd, req.response.c_str(), req.response.size());
 
 					// std::cout << "===" << std::endl;
