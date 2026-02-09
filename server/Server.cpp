@@ -162,6 +162,7 @@ void	Server::run( void )
 					int	index = getServerAndReqOfClient[readyFd].second;
 					HTTP_Req	&req = requestServer->currentRequests[index];
 
+					//std::cout << req.parsingerr<<std::endl;
 					requestServer->serve(req, req.parsingerr);
 					requestServer->handleErrPages(req);
 					write(readyFd, req.response.c_str(), req.response.size());
