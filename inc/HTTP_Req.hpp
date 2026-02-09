@@ -5,15 +5,17 @@
 #define HTTP_REQ_HPP
 
 #include "Configs.hpp"
+#include "ReqTokenizer.hpp"
 #include "stdIncludes.hpp"
 #include "typedefs.hpp"
 
-#include <sstream>
+//#include <sstream>
 
 class HTTP_Req {
 public:
 	// === DATA ===
 	// flags
+	std::vector<str>	start_line;
 	bool				isReqHeadComplete;
 	bool				isResComplete;
 	bool				sentResHead;
@@ -28,6 +30,11 @@ public:
 	Headers				headers;
 	Queries				queries;
 	long				contentLength;
+	std::vector<str>	TransferEncoding;
+
+	str					parsingerr; 
+
+	str	_host_name;
 	str					body;
 	int					CGI;
 	

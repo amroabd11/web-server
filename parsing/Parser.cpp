@@ -241,7 +241,7 @@ static void	parse_locations(virtualServersParsing& vser, size_t &i, std::vector<
 //	std::cout << "--------------------------------closing location"<<std::endl;
 }
 
-Parser::Parser(std::vector<virtualServersParsing> &vservers, std::vector<Token> &tokensBlock) //TODO it should be reimplemented 
+Parser::Parser(std::vector<virtualServersParsing> &vservers, std::vector<Token> &tokensBlock)
 {
 	std::vector<Token> &block = tokensBlock;
 	std::map<std::string, handler_t> handlers = init_server_handler();

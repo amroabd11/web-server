@@ -5,6 +5,8 @@ webserv
 obj
 *.sw*
 *.sw*
+*.swp
+*.swo
 
 *test.*
 logs
