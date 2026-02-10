@@ -87,7 +87,7 @@ void	HTTP_Req::parse(str _rawBytes)
 	//	std::cout <<"contentlength in server "<< contentLength<<std::endl;
 		//std::cout <<"connection : << "<< _req_tokens.getHeaders()["Connection"]<<std::endl;
 		parsingerr = _req_tokens.error;
-		//this->body = _req_tokens.body;
+		this->body = _req_tokens.body;
 	}
 	catch(const std::exception& e){
 //		std::cout << e.what() <<std::endl;

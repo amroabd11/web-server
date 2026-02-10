@@ -90,7 +90,7 @@ ReqTokenizer::ReqTokenizer(str &_bytes)
 		else
 			throw std::runtime_error("error: correctSYNTAX:headers token:OSPvalueOSPcrlf");
 	}
-	//body = _bytes.substr(_h_end_pos+4);
+	body = _bytes.substr(_h_end_pos);
 //	if (start_line[0] == "POST")
 //	{
 //		error = handle_postReq(headers);
