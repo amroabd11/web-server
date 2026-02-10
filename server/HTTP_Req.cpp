@@ -134,7 +134,7 @@ std::ostream& operator<<(std::ostream& os, const HTTP_Req& req) {
     os << "\033[1;34m" << "Method: " << req.method << "\033[0m\n";
     os << "\033[1;34m" << "Route: " << req.route << "\033[0m\n";
     os << "\033[1;34m" << "Version: " << req.version << "\033[0m\n";
-    os << "\033[1;34m" << "Request String: " << req.requestStr << "\033[0m\n";
+    os << "\033[1;34m" << "\n\nRequest String: " << hexify(req.requestStr) << "\n\033[0m\n\n\n";
     os << "\033[1;34m" << "Response Status: " << req.responseStatus << "\033[0m\n";
 
     // Content length and transfer encoding

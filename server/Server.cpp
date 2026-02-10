@@ -134,6 +134,7 @@ void	Server::run( void )
 
 					req.parse(str((const char *)clientReqBuffer, clientReqSize));
 
+					std::cout << req;
 					// std::cout << req.body << "BEGIN BODY\n";
 					// std::cout << req.body << "\n";
 					// std::cout << req.body << "END BODY\n";
