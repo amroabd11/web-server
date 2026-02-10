@@ -53,7 +53,10 @@ public:
 	HTTP_Req(const HTTP_Req& other);
 	HTTP_Req& operator=(const HTTP_Req& other);
 	~HTTP_Req();
+
 };
+
+std::ostream& operator<<(std::ostream& os, const HTTP_Req& req);
 
 class Chunk {
 public:
