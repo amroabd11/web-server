@@ -22,7 +22,7 @@ void logStringAsHex(str str);
 #define IS_SP(x) (x ==' ' || x =='\t')
 #define IS_CTL(x) (x =='\r' || x =='\n')
 #define FD_NOT_SERVER -1
-#define HTTPRequestBufferSize 10
+#define HTTPRequestBufferSize 1024
 #define HTTPResponseBufferSize 1024
 #define HTTP_POST_ReqBufferSize 1024
 
