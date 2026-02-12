@@ -62,31 +62,25 @@ void	HTTP_Req::parse(str _rawBytes)
 	if (this->isReqHeadComplete)
 	{
 		this->body = str(_rawBytes);
-		std::cout << "\n--this body when headIsComplete:::::  "<<body<< "\nb++++++++++\n"<<std::endl;
+		std::cout << "\n--this body when headIsComplete:::::  \n"<<body<< "\nb++++++++++\n"<<std::endl;
 		return ;
 	}
 
-	std::cout << "||||||||||" << std::endl;	
-	std::cout << _rawBytes << std::endl;	
-	std::cout << "||||||||||" << std::endl;	
+//	std::cout << "||||||||||" << std::endl;	
+//	std::cout << _rawBytes << std::endl;	
+//	std::cout << "||||||||||" << std::endl;	
 
 	requestStr += str(_rawBytes); // THIS  is for chuncked requests
 	size_t _header_end = requestStr.find(str(CRLF) + str(CRLF)); 
 	if (_header_end == str::npos)
 		return ;
+	//std::cout << "nowwwwwwwwww\n";
 	try{
 		ReqTokenizer _req_tokens(requestStr);
 		method = _req_tokens.getReqLine()[0];
 		route = _req_tokens.getReqLine()[1];
 		version = _req_tokens.getReqLine()[2];
 
-		std::cout << "=========================" <<std::endl;
-		std::cout << route <<std::endl;
-		std::cout << "=========================" <<std::endl;
-
-		std::cout << "\n#######this is the method :  " << method <<std::endl;
-		std::cout << "*******this is the route :  " << route <<std::endl;
-		std::cout << "------ thsi is the version :  "<< version <<std::endl;
 
 		_host_name = _req_tokens.getHeaders()["Host"];
 		if (_host_name.empty())
@@ -96,13 +90,6 @@ void	HTTP_Req::parse(str _rawBytes)
 		}
 		headers = _req_tokens.getHeaders();
 
-	//	std::cout << "this are headers --------------------------------------------"<<std::endl;
-	//	std::map<str, str>::iterator it;
-	//	for (it = headers.begin(); it!= headers.end(); ++it)
-	//	{
-	//		std::cout << it->first << "--> "<<it->second<<std::endl;
-	//	}
-	//	std::cout << "this is the end ----------------------------------------------"<<std::endl;
 
 		strStrm(_req_tokens.getHeaders()["Content-Length"]) >> contentLength;
 		parsingerr = _req_tokens.error;

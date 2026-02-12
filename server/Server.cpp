@@ -136,7 +136,7 @@ void	Server::run( void )
 
 					req.parse(str((const char *)clientReqBuffer, clientReqSize));
 
-					std::cout << req;
+					//std::cout << req;
 					// std::cout << req.body << "BEGIN BODY\n";
 					// std::cout << req.body << "\n";
 					// std::cout << req.body << "END BODY\n";
@@ -166,21 +166,10 @@ void	Server::run( void )
 					HTTP_Req	&req = requestServer->currentRequests[index];
 
 					//std::cout << req.parsingerr<<std::endl;
-                    // Server::getVServerByHostIterator it = getVServerByHost.find(req._host_name);
-                    // if (it != getVServerByHost.end())
-                    // {
-					//     requestServer->serve(req, req.parsingerr);
-					//     requestServer->handleErrPages(req);
-                    //     requestServer = it->second;
-                    // }
-                    // else
-                    // {
-                    //     req.responseStatus = HTTP_400;
-					//     this->vServers[0].handleErrPages(req);
-                    // }
- 
-					// write(1, req.response.c_str(), req.response.size());
-					// write(readyFd, req.response.c_str(), req.response.size());
+
+					requestServer->serve(req, req.parsingerr);
+					// requestServer->handleErrPages(req);
+					write(readyFd, req.response.c_str(), req.response.size());
 
 					// std::cout << "===" << std::endl;
 					// std::cout << req.response << std::endl;
