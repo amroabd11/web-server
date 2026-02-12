@@ -13,18 +13,11 @@ static str firstLine_syntax(std::vector<str> &startLine)
 	return HTTP_000;
 }
 
-//str	ReqTokenizer::handle_postReq(str& headers)
-//{
-//	
-//}
-//
-//void	ReqTokenizer::handle_getReq(size_t& pos)
-//{
-//	
-//}
+
 
 ReqTokenizer::ReqTokenizer(str &_bytes)
 {
+	std::cout << "\n------------------------------------------------\n"<<_bytes<<"\n-------------------------------------------------------\n"<<std::endl;
 	size_t	_h_end_pos = _bytes.find(str(CRLF) + str(CRLF));
 	_h_end_pos += 4;
 
@@ -57,7 +50,6 @@ ReqTokenizer::ReqTokenizer(str &_bytes)
 		throw std::runtime_error("error in request line form");
 	}
 	error = firstLine_syntax(start_line);
-//	std::cout << error<<std::endl;
 	if (error != HTTP_000)
 		 throw std::runtime_error("error in firstLine_syntax");
 	str	headers = _bytes.substr(curr_pos + 2, _h_end_pos);
@@ -90,15 +82,6 @@ ReqTokenizer::ReqTokenizer(str &_bytes)
 		else
 			throw std::runtime_error("error: correctSYNTAX:headers token:OSPvalueOSPcrlf");
 	}
-//	body = _bytes.substr(_h_end_pos);
-//	if (start_line[0] == "POST")
-//	{
-//		error = handle_postReq(headers);
-//	}
-//	else if (start_line[0] == "GET")
-//		handle_getReq(curr_pos+2);	
-//	else if (start_line[0] == "DELETE")
-//		handle_deleteReq();
 }
 ReqTokenizer::~ReqTokenizer()
 {}

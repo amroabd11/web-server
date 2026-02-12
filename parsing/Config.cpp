@@ -6,7 +6,7 @@ Config::Config() //TODO it still needs to implement some default params
 	memset(&defaultvs, 0, sizeof(defaultvs));
 	defaultvs.port = 8080;
 	defaultvs.host = "0.0.0.0";
-	defaultvs.root = "/app";
+	defaultvs.root = "./";
 	//defaultvs.error = "/error_pages";
 	defaultvs.autoindex = false;
 //	defaultvs.error = NULL;
