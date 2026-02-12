@@ -31,14 +31,13 @@ const char*	Server::somethingWentWrong::what() const throw()
 	return strerror(errno);
 }
 
-
 Server::Server(const Config& config)
 {
 	vsParsed = config.getVservers();
 	this->epfd = epoll_create1(0);
 	if (epfd < 0)
 		somethingWentWrongFunc("epoll_create1");
-
+    
 	for (unsigned long i = 0; i < vsParsed.size(); i++)
 	{
 		int port = vsParsed[i].port;
@@ -47,6 +46,9 @@ Server::Server(const Config& config)
 		VirtualServer	vServ(host, port, epfd, config);
 		vServ.vServConfig = &vsParsed[i];
 		vServers.push_back(vServ);
+        strStrm ss;
+        ss << port;
+        getVServerByHost[host+":"+ss.str()] = &vServ;
 	}
 }
 
@@ -164,9 +166,21 @@ void	Server::run( void )
 					HTTP_Req	&req = requestServer->currentRequests[index];
 
 					//std::cout << req.parsingerr<<std::endl;
-					requestServer->serve(req, req.parsingerr);
-					// requestServer->handleErrPages(req);
-					write(readyFd, req.response.c_str(), req.response.size());
+                    // Server::getVServerByHostIterator it = getVServerByHost.find(req._host_name);
+                    // if (it != getVServerByHost.end())
+                    // {
+					//     requestServer->serve(req, req.parsingerr);
+					//     requestServer->handleErrPages(req);
+                    //     requestServer = it->second;
+                    // }
+                    // else
+                    // {
+                    //     req.responseStatus = HTTP_400;
+					//     this->vServers[0].handleErrPages(req);
+                    // }
+ 
+					// write(1, req.response.c_str(), req.response.size());
+					// write(readyFd, req.response.c_str(), req.response.size());
 
 					// std::cout << "===" << std::endl;
 					// std::cout << req.response << std::endl;

@@ -14,16 +14,18 @@ class Server {
 
 private:
 	// === UTILITY functions ===
-	unsigned long	isServerFd( int fd );
-	std::vector<virtualServersParsing> vsParsed;
+	unsigned long						isServerFd( int fd );
+	std::vector<virtualServersParsing>	vsParsed;
 
 public:
 
 	// === DATA ===
-	int								epfd;
-	std::vector<VirtualServer>		vServers;
+	int												epfd;
+	std::vector<VirtualServer>						vServers;
 	std::map<int, std::pair<VirtualServer*, int> >	getServerAndReqOfClient;
 	// map client fd to vserver ptr and nth request in the list of current requests
+	std::map<str, VirtualServer*>					getVServerByHost;
+	typedef std::map<str, VirtualServer*>::iterator	getVServerByHostIterator;
 	
 	// === CONSTRUCTOR ===
 	Server(const Config& config);

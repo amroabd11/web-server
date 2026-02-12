@@ -92,6 +92,12 @@ void	VirtualServer::handleGET_Req(HTTP_Req& request, Chunk& chunck, str& file2Se
 	if (request.GET_fd == -2)
 		request.GET_fd = cgi.prepareFd(request, file2Serv);
 
+
+	std::cout << "request.GET_fd" << std::endl;
+	std::cout << request.GET_fd << std::endl;
+	std::cout << file2Serv << std::endl;
+	std::cout << "request.GET_fd" << std::endl;
+
 	//  check if open 
 	if (request.GET_fd == -1)
 	{
@@ -217,16 +223,39 @@ void		VirtualServer::serve(HTTP_Req& request, str forcedStatus)
 
 void		VirtualServer::handleErrPages(HTTP_Req& request)
 {
+	static bool	entrant = false;
 	str	status = request.responseStatus;
-	strStrm ss(status);
-	str	statusCode;
+	strStrm ss1(status);
+	int	statusCodeInt;
 
-	ss >> statusCode;
-	if (request.responseStatus != HTTP_200) // supported err codes
+	strStrm ss2(status);
+	str	statusCodeStr;
+
+	ss1 >> statusCodeInt;
+	ss2 >> statusCodeInt;
+
+	std::cout << statusCodeInt << std::endl;
+	std::cout << statusCodeInt << std::endl;
+	std::cout << statusCodeInt << std::endl;
+	std::cout << statusCodeInt << std::endl;
+	std::cout << statusCodeInt << std::endl;
+	std::cout << statusCodeInt << std::endl;
+	std::cout << statusCodeInt << std::endl;
+	std::cout << statusCodeInt << std::endl;
+	std::cout << (statusCodeInt >= 400 && statusCodeInt < 600) << std::endl;
+
+	if (entrant)
+	{
+		this->serve(request, status);
+		if (request.isResComplete)
+			entrant = false;
+	}
+
+	if (statusCodeInt >= 400 && statusCodeInt < 600 && !entrant) // supported err codes
 	{
 		request = HTTP_Req();
 		request.method = "GET";
-		request.route = "/default_err_pages/" + statusCode + ".html";
+		request.route = "./default_err_pages/" + str(statusCodeStr) + ".html";
 		request.version = VERSION;
 		request.sentResHead = false;
 		request.isReqHeadComplete = true;
@@ -237,6 +266,7 @@ void		VirtualServer::handleErrPages(HTTP_Req& request)
 			request.GET_fd = -2;
 			request.response += str("0") + CRLF + CRLF;
 		}
+		entrant = true;
 	}
 }
 
