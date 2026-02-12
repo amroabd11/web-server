@@ -165,7 +165,7 @@ void	Server::run( void )
 
 					//std::cout << req.parsingerr<<std::endl;
 					requestServer->serve(req, req.parsingerr);
-					requestServer->handleErrPages(req);
+					// requestServer->handleErrPages(req);
 					write(readyFd, req.response.c_str(), req.response.size());
 
 					// std::cout << "===" << std::endl;
