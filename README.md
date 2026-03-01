@@ -1,2 +1,2 @@
 # web-server
-a c++ web server 
+  A  webserver that supports  `http/1.1`   
